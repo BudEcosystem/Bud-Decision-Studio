@@ -88,7 +88,7 @@ With fewer than 50 examples, these are rough estimates, and the recommendation s
 
 **Every example** lists each example, its right answer and each model's answer with its probability, marked right or wrong. **Mistakes** shows only the examples some model got wrong; **Confident mistakes** only those answered wrongly with 90% or more. The table shows the first 400 rows.
 
-**Export CSV** downloads every example with each model's answer and probability, as `bud-decision-results.csv`.
+**Export CSV** downloads every example with each model's answer and probability, as `bud-decision-results.csv`. The Mac app asks where to save it.
 
 ## Notes
 
