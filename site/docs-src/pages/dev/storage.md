@@ -15,7 +15,7 @@ The desktop app keeps everything in its application-data folder: the engine it i
 | Desktop app on Windows | `%APPDATA%\ai.bud.decisionstudio\data` |
 | Source checkout | `./data` |
 
-Model weights stay in the standard Hugging Face cache, `~/.cache/huggingface/hub` unless `HF_HOME` says otherwise, and are shared with every other tool that uses it. Deleting the data folder never deletes a model; deleting a model on the Models page never touches your history.
+Model weights stay in the standard Hugging Face cache, `~/.cache/huggingface/hub` unless `HF_HOME` says otherwise, and are shared with every other tool that uses it. A **Models folder** chosen on the System page replaces it; the choice is kept as `models_dir` in `config.json`, and the folder is laid out the same way. Deleting the data folder never deletes a model; deleting a model on the Models page never touches your history.
 
 :::console Terminal
 @@ Linux

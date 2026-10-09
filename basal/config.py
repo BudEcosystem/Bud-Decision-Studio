@@ -4,6 +4,8 @@ the runtime uses it as the default for every model and offers the other devices 
 Runtime device names follow PyTorch: "cuda" (NVIDIA, and AMD through ROCm), "mps" (Apple Silicon), "xpu" (Intel GPUs),
 "cpu". Without a config file (a source checkout set up before the installer existed) the device is inferred from
 nvidia-smi and the platform, without importing PyTorch in the server process.
+
+The same file keeps the folder chosen for downloaded models on the System page (`models_dir`); basal/hub.py uses it.
 """
 from __future__ import annotations
 
@@ -12,6 +14,7 @@ import platform
 import shutil
 import subprocess
 from functools import lru_cache
+from pathlib import Path
 
 from .paths import DATA, NO_WINDOW
 
@@ -27,10 +30,22 @@ def load() -> dict:
 
 
 def save(patch: dict) -> dict:
+    """Merge `patch` into the file; a key set to None is removed."""
     cfg = {**load(), **patch}
+    for k, v in patch.items():
+        if v is None:
+            cfg.pop(k)
     CONFIG_FILE.write_text(json.dumps(cfg, indent=2))
     available.cache_clear()
+    models_dir.cache_clear()
     return cfg
+
+
+@lru_cache(maxsize=1)
+def models_dir() -> Path | None:
+    """The folder chosen for downloaded models on the System page; None: Hugging Face's own cache."""
+    p = load().get("models_dir")
+    return Path(p) if p else None
 
 
 @lru_cache(maxsize=1)

@@ -1,9 +1,10 @@
-// System: where models run (chosen during setup), memory, what each loaded model is using, and memory settings.
+// System: where models run (chosen during setup) and the folder they download to, memory, what each loaded model is
+// using, and memory settings.
 
-import { showLogs } from './models.js';
-import { api, ejectModel, phaseTrack, store } from '../store.js';
+import { diskUse, showLogs } from './models.js';
+import { api, ejectModel, phaseTrack, refresh, store } from '../store.js';
 import { setSub } from '../shell.js';
-import { $, $$, esc, fmtGB, icon, term, toast } from '../util.js';
+import { $, $$, askText, confirmDialog, esc, fmtBytes, fmtGB, icon, term, toast } from '../util.js';
 
 let root;
 
@@ -41,7 +42,7 @@ function update() {
     : dev.unified_memory
       ? `Models run on ${esc(rt.device_name)}. Its GPU and CPU share one pool of ${term('unified_memory', 'unified memory')}, so loaded models and other programs draw from the same memory.`
       : `Models run on ${esc(rt.device_name)}.`;
-  renderRunsOn(rt);
+  renderRunsOn(rt, st);
   const detail = rt.device === 'cuda' ? `CUDA ${esc(s.cuda || 'unknown')}, driver ${esc(s.driver || 'unknown')}`
     : rt.device === 'mps' ? 'Apple GPU through Metal' : rt.device === 'xpu' ? 'Intel GPU through oneAPI' : `${s.cpu_count || ''} cores`;
   const html = `
@@ -79,10 +80,13 @@ function update() {
   renderSettings(st);
 }
 
-// "Where models run": the device chosen during setup, switchable among the ones PyTorch was installed for.
-function renderRunsOn(rt) {
+// "Where models run": the device chosen during setup, switchable among the ones PyTorch was installed for, and the
+// folder models download to.
+function renderRunsOn(rt, st) {
   const box = $('#runson', root);
-  const key = JSON.stringify([rt.device, rt.available.map((d) => d.id)]);
+  const md = rt.models_dir;
+  const busy = !!st.downloads?.active;
+  const key = JSON.stringify([rt.device, rt.available.map((d) => d.id), md, busy]);
   if (!box || box.dataset.key === key) return;
   box.dataset.key = key;
   const label = (d) => (d.id === 'cpu' ? 'Processor (CPU)' : `${d.name} (GPU)`);
@@ -93,6 +97,7 @@ function renderRunsOn(rt) {
       <div class="seg" role="group" aria-label="Run models on">${rt.available.map((d) => `<button data-dev="${d.id}" aria-pressed="${d.id === rt.device}">${icon(d.id === 'cpu' ? 'cpu' : 'lightning')}${esc(label(d))}</button>`).join('')}</div></div>
     <div class="grow"><span style="flex:1;min-width:0">Installed engine<span class="help" style="display:block">${rt.torch ? `PyTorch ${esc(rt.torch)}${when ? `, set up on ${esc(when)}` : ''}.` : 'Set up from source.'} To run on a different processor, run setup again; it installs the matching engine.</span></span>
       ${desktop ? `<button class="btn" id="resetup">${icon('arrows-clockwise')}Run setup again</button>` : `<code class="small">./install.sh</code>`}</div>
+    ${md ? modelsDirRow(md, busy) : ''}
   </section>`;
   $$('[data-dev]', box).forEach((b) => b.addEventListener('click', async () => {
     try {
@@ -102,6 +107,53 @@ function renderRunsOn(rt) {
     } catch (e) { toast(e.message, 'error'); }
   }));
   $('#resetup', box)?.addEventListener('click', () => window.__TAURI__.core.invoke('rerun_setup').catch((e) => toast(String(e), 'error')));
+  $('#mdpick', box)?.addEventListener('click', () => pickModelsDir(md));
+  $('#mdreset', box)?.addEventListener('click', () => setModelsDir(null, md));
+}
+
+// "Models folder": where downloads go. The Hugging Face cache unless another folder (say, on an external disk) is chosen.
+function modelsDirRow(md, busy) {
+  const help = !md.available
+    ? '<b style="color:var(--red-text)">Not available.</b> Connect its disk, or choose another folder. Until then, the models in it show as not downloaded.'
+    : md.custom
+      ? 'New downloads go here. Models downloaded to another folder are not used until you move them here.'
+      : 'The Hugging Face cache, shared with your other tools. Choose another folder to keep models on another disk.';
+  const dis = busy ? 'disabled' : '';
+  return `<div class="grow"><span style="flex:1;min-width:0">Models folder<span class="help" style="display:block"><code style="overflow-wrap:anywhere">${esc(md.path)}</code><br>${help}${busy ? ' To change it, wait for the current download to finish.' : ''}</span></span>
+    <span style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">${md.custom ? `<button class="btn btn-quiet" id="mdreset" ${dis}>${icon('arrow-counter-clockwise')}Use the default</button>` : ''}<button class="btn" id="mdpick" ${dis}>${icon('hard-drive')}Change…</button></span></div>`;
+}
+
+// The desktop app opens the system's folder picker; in a browser, type the path.
+async function pickModelsDir(md) {
+  let path;
+  if (window.__TAURI__) {
+    try { path = await window.__TAURI__.core.invoke('pick_folder', { start: md.available ? md.path : md.default }); }
+    catch (e) { toast(String(e), 'error'); return; }
+  } else {
+    path = await askText({ title: 'Models folder', label: 'The full path of the folder to download models to, for example one on an external disk.', value: md.path, confirm: 'Use this folder' });
+  }
+  if (path && path !== md.path) setModelsDir(path, md);
+}
+
+// path null: back to the Hugging Face cache. Models already downloaded stay where they are, so say so first.
+async function setModelsDir(path, md) {
+  const st = store.state;
+  const here = st.models.filter((m) => m.downloaded && m.download?.have).length;
+  if (here) {
+    const [what, stay, its, folders, them] = here === 1 ? ['model', 'stays', 'its', 'folder', 'it'] : [`${here} models`, 'stay', 'their', 'folders', 'them'];
+    const ok = await confirmDialog({
+      title: 'Download models to this folder?',
+      body: `<p>New downloads go to <code style="overflow-wrap:anywhere">${esc(path ?? md.default)}</code>.</p>
+        <p style="margin-top:8px">The ${what} already downloaded (${fmtBytes(diskUse(st.models))}) ${stay} in <code style="overflow-wrap:anywhere">${esc(md.path)}</code>. The studio only looks in the new folder, so move ${its} <code>models--</code> ${folders} across to keep using ${them}, or download ${them} again.</p>`,
+      confirm: 'Use this folder',
+    });
+    if (!ok) return;
+  }
+  try {
+    await api('/api/config', { method: 'POST', body: { models_dir: path } });
+    toast(path ? 'Models will download to the new folder.' : 'Models will download to the Hugging Face cache.');
+    refresh();
+  } catch (e) { toast(e.message, 'error'); }
 }
 
 function renderSettings(st) {

@@ -206,14 +206,8 @@ function renderTable() {
   const html = `<table class="table hover mtable"><colgroup><col><col class="c-size"><col class="c-mem"><col class="c-reads"><col class="c-jev"><col class="c-st"></colgroup><thead><tr>${th('name', 'Model')}${th('size', 'Size', 'num')}${th('memory', '<span data-tip="Memory it needs when loaded">Needs</span>', 'num')}<th>Reads</th>${th('jev', 'Ahead of Jev')}<th style="text-align:right">Status</th></tr></thead>
     <tbody>${rows || `<tr><td colspan="6"><div class="empty" style="padding:24px"><p>No model matches "${esc(filter.q)}".</p></div></td></tr>`}${jevRow}</tbody></table>`;
   const onDisk = st.models.filter((m) => m.downloaded).length;
-  // Count a shared base model (for example the Qwen base under Kev 4B and Lev) once.
-  const bases = new Map();
-  const disk = st.models.reduce((a, m) => {
-    if (!m.downloaded) return a + (m.download?.have || 0);
-    if (m.base) bases.set(m.base.id, m.base_bytes || 0);
-    return a + (m.download_bytes - (m.base ? m.base_bytes || 0 : 0));
-  }, 0) + [...bases.values()].reduce((a, v) => a + v, 0);
-  const foot = `<div class="table-foot">${onDisk} of ${st.models.length} models on this machine, taking up ${fmtBytes(disk)} of disk.${st.hf_cache ? ` <code>${esc(st.hf_cache)}</code>` : ''}</div>`;
+  const disk = diskUse(st.models);
+  const foot = `<div class="table-foot">${onDisk} of ${st.models.length} models on this machine, taking up ${fmtBytes(disk)} of disk.${st.hf_cache ? ` <code>${esc(st.hf_cache)}</code> <a href="#/system">Change the folder</a>` : ''}</div>`;
   const all = html + foot;
   if (box.dataset.html !== all) { box.dataset.html = all; box.innerHTML = all; bindActions(box); }
   setSub(`${onDisk} of ${st.models.length} on this machine`);
@@ -431,6 +425,17 @@ async function del(id) {
   try { const r = await api(`/api/models/${id}/files`, { method: 'DELETE' }); toast(r.removed.length ? `Deleted ${m.name}'s files` : 'Nothing to delete'); }
   catch (e) { toast(e.message, 'error'); }
   refresh();
+}
+
+// Bytes the models take on disk, partial downloads included. A shared base model (for example the Qwen base under
+// Kev 4B and Lev) counts once.
+export function diskUse(models) {
+  const bases = new Map();
+  return models.reduce((a, m) => {
+    if (!m.downloaded) return a + (m.download?.have || 0);
+    if (m.base) bases.set(m.base.id, m.base_bytes || 0);
+    return a + (m.download_bytes - (m.base ? m.base_bytes || 0 : 0));
+  }, 0) + [...bases.values()].reduce((a, v) => a + v, 0);
 }
 
 export async function showLogs(id) {

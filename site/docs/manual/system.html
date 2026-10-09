@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>API, Learn and System · Bud Decision Studio Docs</title>
-  <meta name="description" content="The API page (the studio&#x27;s address, endpoints and ready-to-run code), the Learn page (a short introduction to decision models), and the System page (where models run, memory, and when models are ejected).">
+  <meta name="description" content="The API page (the studio&#x27;s address, endpoints and ready-to-run code), the Learn page (a short introduction to decision models), and the System page (where models run, the folder they download to, memory, and when models are ejected).">
   <meta name="theme-color" content="#0F0C17">
   <meta property="og:title" content="API, Learn and System · Bud Decision Studio">
-  <meta property="og:description" content="The API page (the studio&#x27;s address, endpoints and ready-to-run code), the Learn page (a short introduction to decision models), and the System page (where models run, memory, and when models are ejected).">
+  <meta property="og:description" content="The API page (the studio&#x27;s address, endpoints and ready-to-run code), the Learn page (a short introduction to decision models), and the System page (where models run, the folder they download to, memory, and when models are ejected).">
   <meta property="og:type" content="article">
   <link rel="icon" type="image/png" href="../../assets/brand/favicon.png">
   <link rel="preload" href="../../assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
@@ -116,8 +116,10 @@
 <h3 id="where-models-run">Where models run<a class="anchor" href="#where-models-run" title="Link to this section">#</a></h3>
 <p><strong>Run models on</strong> switches between the GPU and the processor (CPU). It applies to models you load from now on; loaded models keep running where they are. The choices are the ones the installed engine supports.</p>
 <p><strong>Installed engine</strong> says which PyTorch build is installed and when. To run models on a different kind of processor (for example, after adding a GPU), the engine must be reinstalled: in the desktop app, choose <strong>Run setup again</strong>; from source, run <code>./install.sh</code> again.</p>
+<p><strong>Models folder</strong> is where downloads go. It starts as the standard Hugging Face cache, shared with your other tools. To keep models somewhere else, such as an external disk with more room, choose <strong>Change…</strong> and pick a folder; the desktop app opens your system's folder picker, and a browser asks for the folder's full path. <strong>Use the default</strong> goes back to the Hugging Face cache. The change applies straight away to new downloads and to models you load from then on. It can't be made while a model is downloading.</p>
+<p>Models already downloaded stay in the previous folder, and the studio only looks in the folder you chose. To keep using them, move their <code>models--…</code> folders into the new one; otherwise, download them again. If the folder's disk is not connected, the row says so, the models in it show as not downloaded, and a download stops with a message rather than fill the computer's own disk. Connect the disk and the models are back.</p>
 <h3 id="memory-and-load">Memory and load<a class="anchor" href="#memory-and-load" title="Link to this section">#</a></h3>
-<p>The figures at the top show what models run on, how busy it is (it jumps while a model answers), its temperature and power where the GPU reports them, and the free disk for models.</p>
+<p>The figures at the top show what models run on, how busy it is (it jumps while a model answers), its temperature and power where the GPU reports them, and the free space on the disk that holds the models folder.</p>
 <p><strong>Memory</strong> shows how much memory is in use and how much is available for more models, split into loaded models (violet), other programs (grey) and free. On computers whose GPU and processor share one pool of memory, such as Apple Silicon Macs and the NVIDIA GB10, loaded models and other programs draw from the same memory, so a busy computer leaves less room for models.</p>
 <p><strong>Loaded models</strong> lists each model in memory: its status, the memory it uses, how many requests it has answered, how long it took to load, and its process and load settings. <strong>Log</strong> shows the model's own log; <strong>Eject</strong> unloads it. <strong>Eject all models</strong> at the top of the page unloads them all.</p>
 <p>A model marked <strong>On the processor</strong> asked for the GPU but found too little free memory when it loaded, so it runs about ten times slower. Eject other models, or close other programs that use the GPU, and load it again.</p>

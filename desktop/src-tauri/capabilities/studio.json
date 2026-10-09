@@ -1,8 +1,8 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "studio",
-  "description": "The studio page, served by the local engine on 127.0.0.1: it may only reopen setup and open web links.",
+  "description": "The studio page, served by the local engine on 127.0.0.1: it may only reopen setup, open web links, and ask for a folder (the models folder on the System page).",
   "windows": ["main"],
   "remote": { "urls": ["http://127.0.0.1:*"] },
-  "permissions": ["allow-rerun-setup", "allow-open-external"]
+  "permissions": ["allow-rerun-setup", "allow-open-external", "allow-pick-folder"]
 }

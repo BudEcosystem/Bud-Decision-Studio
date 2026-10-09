@@ -129,7 +129,7 @@ Install the new version over the old one: download it from the [latest release](
 
 ### How do I uninstall it?
 
-Remove the app as you would any other. The engine and your data are in the app's application-data folder (`ai.bud.decisionstudio`, listed on [Data and storage](/docs/dev/storage#where-the-data-lives)); delete it to remove them too. Models are in the Hugging Face cache, `~/.cache/huggingface/hub`, which other tools may share; delete them on the Models page before uninstalling, or remove their folders from the cache.
+Remove the app as you would any other. The engine and your data are in the app's application-data folder (`ai.bud.decisionstudio`, listed on [Data and storage](/docs/dev/storage#where-the-data-lives)); delete it to remove them too. Models are in the Hugging Face cache, `~/.cache/huggingface/hub`, which other tools may share, unless you chose another **Models folder** on the System page; delete them on the Models page before uninstalling, or remove their folders yourself.
 
 ### Something is not working.
 

@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import contextlib
 import hmac
 import json
 import os
@@ -38,7 +39,8 @@ from . import config as runtime_config
 from . import template_store
 from .catalog import BY_ID, CATALOG
 from .errors import ApiError
-from .hub import META, Downloader, delete_model_files, hub_cache, model_status, repo_likes, repo_size
+from .hub import (META, Downloader, choose_models_dir, delete_model_files, hub_cache, model_status, models_folder,
+                  repo_likes, repo_size)
 from .ids import new_id
 from .paths import DATA, LOGS, UI, UPLOADS
 from .workers import Workers, log_tail
@@ -298,7 +300,7 @@ def state():
         if w:
             w["gpu_gb"] = round(s["gpu_processes"].get(w["pid"], 0.0), 2) or sysinfo.process_tree_rss_gb(w["pid"])
     return {"version": __version__, "models": models, "downloads": downloader.snapshot() if downloader else {},
-            "hf_signed_in": _hf_signed_in(), "runtime": runtime_config.summary(),
+            "hf_signed_in": _hf_signed_in(), "runtime": _runtime(),
             "system": s, "settings": SETTINGS, "loaded": workers.ready(),
             "hf_cache": str(hub_cache())}
 
@@ -428,10 +430,15 @@ def settings(body: dict = Body(...)):
     return SETTINGS
 
 
+def _runtime() -> dict:
+    """The System page's "Where models run": the device chosen during setup, and the folder models download to."""
+    return {**runtime_config.summary(), "models_dir": models_folder()}
+
+
 @app.get("/api/config")
 def get_config():
-    """Where models run on this computer, as chosen during setup."""
-    return runtime_config.summary()
+    """Where models run on this computer, as chosen during setup, and where their weights are kept."""
+    return _runtime()
 
 
 @app.post("/api/config")
@@ -441,7 +448,16 @@ def set_config(body: dict = Body(...)):
         if dev not in [d["id"] for d in runtime_config.available()]:
             raise HTTPException(400, f"This computer cannot run models on {dev!r}. Run setup again to install support for it.")
         runtime_config.save({"device": dev})
-    return runtime_config.summary()
+    if "models_dir" in body:
+        # Hold the queue while the folder changes, so no download starts in the old one and finishes unseen.
+        with (downloader.lock if downloader else contextlib.nullcontext()):
+            if downloader and downloader.active:
+                raise HTTPException(409, "A model is downloading. Wait for it to finish, or cancel it, then change the folder.")
+            try:
+                choose_models_dir(body["models_dir"])
+            except ValueError as e:
+                raise HTTPException(400, str(e)) from e
+    return _runtime()
 
 
 # ------------------------------------------------------------------------------------------------------------------

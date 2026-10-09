@@ -17,6 +17,7 @@ use std::process::{Child, Command, Stdio};
 use std::sync::Mutex;
 use std::time::{Duration, Instant};
 use tauri::{AppHandle, Emitter, Manager, RunEvent, State, Url, WebviewUrl, WebviewWindowBuilder};
+use tauri_plugin_dialog::DialogExt;
 
 const PREFERRED_PORT: u16 = 8420;
 
@@ -401,6 +402,25 @@ fn bundle_outside_applications() -> Option<PathBuf> {
     if s.starts_with("/Applications/") || s.contains("/Applications/") { None } else { Some(bundle) }
 }
 
+/// The System page's "Models folder": the system's own folder picker, over the studio window, starting at `start`.
+/// -> the folder chosen, or None when the person cancels.
+#[tauri::command]
+async fn pick_folder(app: AppHandle, start: Option<String>) -> Option<String> {
+    let mut dialog = app.dialog().file().set_title("Choose a folder for models").set_can_create_directories(true);
+    if let Some(dir) = start.map(PathBuf::from).filter(|d| d.is_dir()) {
+        dialog = dialog.set_directory(dir);
+    }
+    if let Some(win) = app.get_webview_window("main") {
+        dialog = dialog.set_parent(&win);
+    }
+    let (tx, rx) = std::sync::mpsc::channel();
+    dialog.pick_folder(move |p| {
+        let _ = tx.send(p);
+    });
+    let picked = tauri::async_runtime::spawn_blocking(move || rx.recv().ok().flatten()).await.ok().flatten()?;
+    picked.into_path().ok().map(|p| p.to_string_lossy().into_owned())
+}
+
 /// macOS: copy the app into /Applications (or ~/Applications when that is not writable), open the copy, and quit.
 #[tauri::command]
 fn move_to_applications(app: AppHandle) -> Result<(), String> {
@@ -468,9 +488,10 @@ fn main() {
         std::env::set_var("WEBKIT_DISABLE_DMABUF_RENDERER", "1");
     }
     let app = tauri::Builder::default()
+        .plugin(tauri_plugin_dialog::init())
         .manage(Studio::default())
         .invoke_handler(tauri::generate_handler![app_info, detect_hardware, install_engine, start_studio, rerun_setup, open_external,
-                                                 move_to_applications])
+                                                 move_to_applications, pick_folder])
         .setup(|app| {
             #[cfg(target_os = "linux")]
             install_launcher();

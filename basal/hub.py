@@ -1,7 +1,9 @@
 """Downloads: what's on disk, what's missing, and a one-at-a-time download queue.
 
 Weights live in the standard Hugging Face cache (~/.cache/huggingface/hub), so
-anything downloaded by other tools is recognised, and nothing is duplicated.
+anything downloaded by other tools is recognised, and nothing is duplicated. The
+System page can choose another folder instead (say, on an external disk); it is
+laid out the same way, and every process the studio starts is pointed at it.
 
 Queue rule: one download at a time. Waiting models are ordered by the size still
 to download (smallest first); ties go to the model with more likes on the Hub.
@@ -21,6 +23,7 @@ import time
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from . import config as runtime_config
 from .catalog import BY_ID, CATALOG, ModelSpec, Repo
 from .paths import DATA, DETACHED, LOGS
 
@@ -28,9 +31,61 @@ META_FILE = DATA / "hub_meta.json"
 QUEUE_FILE = DATA / "download_queue.json"
 
 
-def hub_cache() -> Path:
+def default_cache() -> Path:
+    """Hugging Face's own cache: ~/.cache/huggingface/hub, unless HF_HUB_CACHE or HF_HOME say otherwise."""
     from huggingface_hub import constants
     return Path(constants.HF_HUB_CACHE)
+
+
+def hub_cache() -> Path:
+    """Where model weights are: the folder chosen on the System page, else Hugging Face's own cache."""
+    return runtime_config.models_dir() or default_cache()
+
+
+def cache_env() -> dict:
+    """For the processes the studio starts (downloads, models, training): find and keep weights in hub_cache()."""
+    return {"HF_HUB_CACHE": str(hub_cache())}
+
+
+def models_folder() -> dict:
+    """The models folder as the System page shows it. `available` is False when the chosen folder is gone, which
+    usually means its disk is not connected."""
+    chosen = runtime_config.models_dir()
+    return {"path": str(chosen or default_cache()), "default": str(default_cache()), "custom": chosen is not None,
+            "available": chosen is None or chosen.is_dir()}
+
+
+def choose_models_dir(path: str | None) -> None:
+    """Keep downloaded models in `path` from now on; None or "" goes back to Hugging Face's own cache. Models already
+    downloaded stay where they are. Raises ValueError, worded for the person choosing, when the folder can't be used."""
+    if path is not None and not isinstance(path, str):
+        raise ValueError("models_dir is the full path of a folder, or null for the Hugging Face cache.")
+    if not path or not path.strip():
+        runtime_config.save({"models_dir": None})
+        return
+    p = Path(path.strip()).expanduser()
+    if not p.is_absolute():
+        raise ValueError(f"Give the full path of the folder, not {path!r}.")
+    p = Path(os.path.normpath(p))
+    if p == default_cache():
+        runtime_config.save({"models_dir": None})
+        return
+    if not p.exists():
+        if not p.parent.is_dir():
+            raise ValueError(f"{p.parent} does not exist. Connect its disk, or choose another folder.")
+        try:
+            p.mkdir()
+        except OSError as e:
+            raise ValueError(f"Could not create {p}: {e.strerror or e}.") from e
+    if not p.is_dir():
+        raise ValueError(f"{p} is a file, not a folder.")
+    probe = p / f".bud-studio-write-check-{os.getpid()}"
+    try:
+        probe.write_bytes(b"")
+        probe.unlink()
+    except OSError as e:
+        raise ValueError(f"Can't save files in {p}: {e.strerror or e}. Choose a folder you can write to.") from e
+    runtime_config.save({"models_dir": str(p)})
 
 
 def repo_dir(repo_id: str) -> Path:
@@ -353,6 +408,10 @@ class Downloader:
             job.pid = None
             if job.error == "cancelled":
                 return
+        chosen = runtime_config.models_dir()
+        if chosen and not chosen.is_dir():   # never fill the computer's own disk in place of a disconnected one
+            job.error = f"The models folder {chosen} is not available. Connect its disk, or choose another folder on the System page."
+            return
         for i, repo in enumerate(spec.repos()):
             job.repo_index = i
             if job.error == "cancelled":
@@ -367,7 +426,7 @@ class Downloader:
                 cmd += ["--include", *repo.include]
             if repo.exclude:
                 cmd += ["--exclude", *repo.exclude]
-            env = {**os.environ, "HF_HUB_DISABLE_PROGRESS_BARS": "1", "HF_HUB_OFFLINE": "0",
+            env = {**os.environ, **cache_env(), "HF_HUB_DISABLE_PROGRESS_BARS": "1", "HF_HUB_OFFLINE": "0",
                    "HF_HUB_DISABLE_XET": "1"}   # classic transfer writes .incomplete files, so progress is measurable
             job.proc = subprocess.Popen(cmd, stdout=log, stderr=subprocess.STDOUT, env=env, **DETACHED,
                                         cwd=Path(__file__).resolve().parent.parent)

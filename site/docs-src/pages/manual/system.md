@@ -1,6 +1,6 @@
 ---
 title: API, Learn and System
-description: The API page (the studio's address, endpoints and ready-to-run code), the Learn page (a short introduction to decision models), and the System page (where models run, memory, and when models are ejected).
+description: The API page (the studio's address, endpoints and ready-to-run code), the Learn page (a short introduction to decision models), and the System page (where models run, the folder they download to, memory, and when models are ejected).
 lead: Three pages support the rest of the studio. API gives your code what it needs to call the studio. Learn is a ten-minute introduction to decision models. System shows where models run and how memory is used, and holds the settings for both.
 ---
 
@@ -84,9 +84,13 @@ The System page on an NVIDIA GB10, with Laya loaded. Its GPU and processor share
 
 **Installed engine** says which PyTorch build is installed and when. To run models on a different kind of processor (for example, after adding a GPU), the engine must be reinstalled: in the desktop app, choose **Run setup again**; from source, run `./install.sh` again.
 
+**Models folder** is where downloads go. It starts as the standard Hugging Face cache, shared with your other tools. To keep models somewhere else, such as an external disk with more room, choose **Change…** and pick a folder; the desktop app opens your system's folder picker, and a browser asks for the folder's full path. **Use the default** goes back to the Hugging Face cache. The change applies straight away to new downloads and to models you load from then on. It can't be made while a model is downloading.
+
+Models already downloaded stay in the previous folder, and the studio only looks in the folder you chose. To keep using them, move their `models--…` folders into the new one; otherwise, download them again. If the folder's disk is not connected, the row says so, the models in it show as not downloaded, and a download stops with a message rather than fill the computer's own disk. Connect the disk and the models are back.
+
 ### Memory and load
 
-The figures at the top show what models run on, how busy it is (it jumps while a model answers), its temperature and power where the GPU reports them, and the free disk for models.
+The figures at the top show what models run on, how busy it is (it jumps while a model answers), its temperature and power where the GPU reports them, and the free space on the disk that holds the models folder.
 
 **Memory** shows how much memory is in use and how much is available for more models, split into loaded models (violet), other programs (grey) and free. On computers whose GPU and processor share one pool of memory, such as Apple Silicon Macs and the NVIDIA GB10, loaded models and other programs draw from the same memory, so a busy computer leaves less room for models.
 

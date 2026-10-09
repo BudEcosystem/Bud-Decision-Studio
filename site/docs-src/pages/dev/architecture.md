@@ -14,7 +14,7 @@ Bud Decision Studio has four layers, and a fifth process while a model is being 
 - **A training job** (`basal/training/job.py`), at most one at a time: a separate process that fine-tunes a model on the GPU while the server reads its progress files. It is described on [The trainer](/docs/dev/trainer).
 - **The desktop shell** (`desktop/`, Tauri) installs the engine on first run, starts the server, points its window at it, and stops it on quit.
 
-Model weights are not part of the studio. They live in the standard Hugging Face cache, shared with your other tools.
+Model weights are not part of the studio. They live in the standard Hugging Face cache, shared with your other tools, or in a folder chosen on the System page.
 
 The Python modules in the diagram live in `basal/`.
 
@@ -107,9 +107,9 @@ Adapters live in `basal/adapters/` and are imported lazily, so a worker loads on
 
 `basal/catalog.py` lists the eleven models: their Hugging Face repositories, the adapter that runs them, their limits (question types, options, questions, context length) and the plain-language text the interface shows.
 
-`basal/hub.py` answers "what is on disk" by reading the Hugging Face cache directly, so files downloaded by other tools count. Downloads run **one at a time**, smallest remaining download first, ties going to the model with more likes on the Hub. Each download is its own process (`python -m basal.fetch <repo>`): cancelling is immediate, a failed download cannot disturb the server, and a download keeps going across a studio restart, which picks it up again. The queue is saved in `DATA/download_queue.json`.
+`basal/hub.py` answers "what is on disk" by reading the Hugging Face cache directly, so files downloaded by other tools count. When a models folder is chosen on the System page, it reads that folder instead and gives it to every process it starts (downloads, models, training) as `HF_HUB_CACHE`. Downloads run **one at a time**, smallest remaining download first, ties going to the model with more likes on the Hub. Each download is its own process (`python -m basal.fetch <repo>`): cancelling is immediate, a failed download cannot disturb the server, and a download keeps going across a studio restart, which picks it up again. The queue is saved in `DATA/download_queue.json`.
 
-`basal/config.py` holds where models run: the device chosen during setup (in `DATA/config.json`), the devices this computer offers, and whether a model fits in its memory.
+`basal/config.py` holds where models run: the device chosen during setup (in `DATA/config.json`), the devices this computer offers, and whether a model fits in its memory. The same file keeps the models folder, when one is chosen.
 
 ## Templates and history
 
