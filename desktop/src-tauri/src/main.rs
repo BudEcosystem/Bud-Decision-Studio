@@ -434,6 +434,27 @@ fn move_to_applications(app: AppHandle) -> Result<(), String> {
     }
 }
 
+/// macOS: WebKit drops every download the app does not take, so Export (results CSV, test examples, fine-tunes) did
+/// nothing. Ask where to save each one, starting from Downloads with the file's own name; Cancel stops the download.
+/// Windows and Linux keep their webview's own downloads: WebView2 cannot show a dialog from inside this event.
+#[cfg(target_os = "macos")]
+fn ask_where_to_save(webview: &tauri::Webview, destination: &mut PathBuf) -> bool {
+    let mut dialog = rfd::FileDialog::new().set_parent(&webview.window());
+    if let Some(dir) = destination.parent() {
+        dialog = dialog.set_directory(dir);
+    }
+    if let Some(name) = destination.file_name() {
+        dialog = dialog.set_file_name(name.to_string_lossy());
+    }
+    let Some(path) = dialog.save_file() else { return false };
+    // The save panel has already asked whether to replace an existing file, and WebKit will not write over one.
+    if path.is_file() {
+        let _ = std::fs::remove_file(&path);
+    }
+    *destination = path;
+    true
+}
+
 fn is_local(u: &Url) -> bool {
     matches!(u.scheme(), "tauri" | "asset" | "about" | "data" | "blob")
         || matches!(u.host_str(), Some("127.0.0.1") | Some("localhost") | Some("tauri.localhost"))
@@ -460,7 +481,7 @@ fn main() {
                 w = f64::min(w, s.width * 0.92);
                 h = f64::min(h, s.height * 0.9);
             }
-            let win = WebviewWindowBuilder::new(app, "main", WebviewUrl::App("index.html".into()))
+            let builder = WebviewWindowBuilder::new(app, "main", WebviewUrl::App("index.html".into()))
                 .title("Bud Decision Studio")
                 .inner_size(w, h)
                 .min_inner_size(900.0, 620.0)
@@ -471,8 +492,13 @@ fn main() {
                     }
                     let _ = open_in_browser(u.as_str());
                     false
-                })
-                .build()?;
+                });
+            #[cfg(target_os = "macos")]
+            let builder = builder.on_download(|webview, event| match event {
+                tauri::webview::DownloadEvent::Requested { destination, .. } => ask_where_to_save(&webview, destination),
+                _ => true,
+            });
+            let win = builder.build()?;
             *app.state::<Studio>().home.lock().unwrap() = win.url().ok();
             Ok(())
         })
