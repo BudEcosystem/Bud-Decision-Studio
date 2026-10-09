@@ -401,5 +401,6 @@ function exportCsv() {
   const lines = run.rows.map((r, i) => [q(r.text), q(label(r.gold)), ...ids.flatMap((id) => { const o = run.results[id].items[i]; return o && !o.error ? [q(label(o.pred)), o.top.toFixed(4)] : ['', '']; })].join(','));
   const blob = new Blob([`${head.join(',')}\n${lines.join('\n')}\n`], { type: 'text/csv' });
   const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: 'bud-decision-results.csv' });
-  a.click(); URL.revokeObjectURL(a.href);
+  // Kept for a minute: the desktop app reads the file after asking where to save it, not during the click.
+  a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 60000);
 }
