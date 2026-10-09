@@ -15,6 +15,7 @@ from dataclasses import dataclass, field
 import httpx
 
 from .catalog import BY_ID
+from .hub import cache_env
 from .paths import DETACHED, LOGS, ROOT
 
 
@@ -87,7 +88,7 @@ class Workers:
         port = free_port()
         log = open(LOGS / f"worker-{model_id}.log", "w")
         # MPS fallback: an operation Apple's Metal backend lacks runs on the CPU instead of failing the load.
-        env = {**os.environ, "PYTHONUNBUFFERED": "1", "HF_HUB_OFFLINE": "1", "PYTORCH_ENABLE_MPS_FALLBACK": "1"}
+        env = {**os.environ, **cache_env(), "PYTHONUNBUFFERED": "1", "HF_HUB_OFFLINE": "1", "PYTORCH_ENABLE_MPS_FALLBACK": "1"}
         proc = subprocess.Popen([sys.executable, "-m", "basal.worker", "--model", model_id, "--port", str(port),
                                  "--options", json.dumps(opts)],
                                 stdout=log, stderr=subprocess.STDOUT, env=env, cwd=ROOT, **DETACHED)

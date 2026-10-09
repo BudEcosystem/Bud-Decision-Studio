@@ -19,7 +19,7 @@ What happens on a person's computer:
 | First launch | setup screens: hardware check, device choice, install (`installer/engine.py install`, progress streamed to the window), then the studio opens and offers models to download |
 | Later launches | a short splash while the studio server starts, then the studio |
 | Closing the app | the server is stopped with SIGTERM, which ejects every loaded model first |
-| Files | app data folder (`~/.local/share/ai.bud.decisionstudio`, `~/Library/Application Support/ai.bud.decisionstudio`, `%APPDATA%\ai.bud.decisionstudio`): `engine-env/` (Python and PyTorch), `data/`, `logs/studio.log`. Model weights stay in the shared Hugging Face cache |
+| Files | app data folder (`~/.local/share/ai.bud.decisionstudio`, `~/Library/Application Support/ai.bud.decisionstudio`, `%APPDATA%\ai.bud.decisionstudio`): `engine-env/` (Python and PyTorch), `data/`, `logs/studio.log`. Model weights stay in the shared Hugging Face cache, or the models folder chosen on the System page (picked with the system's folder dialog, through `tauri-plugin-dialog`) |
 
 ## Build
 

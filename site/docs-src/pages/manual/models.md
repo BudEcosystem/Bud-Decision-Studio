@@ -84,7 +84,7 @@ Select a model and choose **Download**, or choose **Download models** to pick se
 **Download models**. Tick the models you want, or use **Recommended** or **Everything that fits**. The line at the bottom adds up the download and the free disk.
 :::
 
-Models download one at a time, smallest first, in the background. The **Downloads** button in the title bar shows the queue, the progress and the time left, and can cancel a download. The models come from each publisher's Hugging Face repository and are stored in the standard Hugging Face cache, where other tools on your computer can use them too.
+Models download one at a time, smallest first, in the background. The **Downloads** button in the title bar shows the queue, the progress and the time left, and can cancel a download. The models come from each publisher's Hugging Face repository and are stored in the standard Hugging Face cache, where other tools on your computer can use them too. To keep them on another disk, choose a **Models folder** on the [System page](/docs/manual/system#where-models-run).
 
 Some models are small adapters on top of a shared base model: Kev 4B and Lev, for example, both use the same Qwen base. The base is downloaded once and shared, and the page counts it once.
 

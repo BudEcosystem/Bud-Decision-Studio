@@ -9,6 +9,7 @@ fn main() {
         "rerun_setup",
         "open_external",
         "move_to_applications",
+        "pick_folder",
     ])))
     .expect("failed to run tauri-build");
 }

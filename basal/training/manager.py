@@ -17,6 +17,7 @@ import time
 import uuid
 from pathlib import Path
 
+from ..hub import cache_env
 from ..paths import DATA, DETACHED, ROOT
 from . import dataformat
 
@@ -235,7 +236,7 @@ def start(model_id: str, ds_id: str, name: str = "") -> dict:
 def _launch(job_id: str) -> None:
     d = JOBS / job_id
     log = open(d / "job.log", "a")
-    env = {**os.environ, "PYTHONUNBUFFERED": "1", "HF_HUB_OFFLINE": "1", "BASAL_DATA": str(DATA),
+    env = {**os.environ, **cache_env(), "PYTHONUNBUFFERED": "1", "HF_HUB_OFFLINE": "1", "BASAL_DATA": str(DATA),
            "PYTORCH_ENABLE_MPS_FALLBACK": "1"}
     _procs[job_id] = subprocess.Popen([sys.executable, "-m", "basal.training.job", str(d)], stdout=log,
                                       stderr=subprocess.STDOUT, env=env, cwd=ROOT, **DETACHED)

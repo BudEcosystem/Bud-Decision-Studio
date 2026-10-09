@@ -445,6 +445,26 @@ def test_settings_and_legacy_history(api, studio):
     assert len(old) == 3 and {"id", "time", "model", "request", "response"} <= set(old[0])
 
 
+def test_models_folder_setting(api, tmp_path):
+    """System > Where models run > Models folder: chosen, reported by the config and the state, refused in words, reset."""
+    h = {"x-basal-client": "1"}
+    before = api.get("/api/config").json()["models_dir"]
+    assert before["custom"] is False and before["path"] == before["default"]
+    try:
+        r = api.post("/api/config", json={"models_dir": str(tmp_path / "models")}, headers=h)
+        assert r.status_code == 200, r.text
+        md = r.json()["models_dir"]
+        assert md == {"path": str(tmp_path / "models"), "default": before["default"], "custom": True, "available": True}
+        st = api.get("/api/state").json()
+        assert st["runtime"]["models_dir"] == md and st["hf_cache"] == md["path"]
+        r = api.post("/api/config", json={"models_dir": "models"}, headers=h)
+        assert r.status_code == 400 and "full path" in r.json()["detail"]
+        assert api.get("/api/config").json()["models_dir"] == md
+    finally:
+        r = api.post("/api/config", json={"models_dir": None}, headers=h)
+    assert r.status_code == 200 and r.json()["models_dir"] == before
+
+
 def test_downloads_switched_off_say_so(api):
     """This test studio runs with BASAL_NO_DOWNLOADS=1: the download endpoints explain that instead of crashing."""
     h = {"x-basal-client": "1"}

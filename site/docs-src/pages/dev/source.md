@@ -157,7 +157,7 @@ The server reads these when it starts. A checkout keeps its data in `./data`; th
 | `BASAL_FAKE_MODEL` | `1` adds the deterministic test model, `fake-decider` |
 | `BASAL_FAKE_LOAD_SECONDS` | Makes the test model take that many seconds to load, for tests of what happens during a load |
 | `BASAL_PARENT_PID` | Set by the desktop app: the server shuts down cleanly when that process is gone |
-| `HF_HOME` | Read by the Hugging Face library: where model weights are cached. Default `~/.cache/huggingface` |
+| `HF_HOME` | Read by the Hugging Face library: where model weights are cached. Default `~/.cache/huggingface`. A **Models folder** chosen on the System page takes precedence |
 
 Two more are read by the tests: `BASAL_TEST_URL`, the studio to test (default `http://127.0.0.1:8420`), and `BASAL_TEST_MODEL` (default `laya`).
 

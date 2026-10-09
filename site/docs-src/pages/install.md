@@ -169,7 +169,7 @@ Inside it:
 | `data/backups/` | a copy of the database made before each upgrade changes it; the three most recent are kept |
 | `logs/studio.log` | the studio server's log |
 
-The models themselves are not in this folder. They stay in the standard Hugging Face cache (`~/.cache/huggingface/hub`, or `C:\Users\<you>\.cache\huggingface\hub` on Windows), so other tools on your computer can share them. It follows Hugging Face's own settings, such as the `HF_HOME` environment variable, and the Models page shows the folder in use.
+The models themselves are not in this folder. They stay in the standard Hugging Face cache (`~/.cache/huggingface/hub`, or `C:\Users\<you>\.cache\huggingface\hub` on Windows), so other tools on your computer can share them. It follows Hugging Face's own settings, such as the `HF_HOME` environment variable, and the Models page shows the folder in use. To keep them somewhere else, such as an external disk, choose a **Models folder** on the [System page](/docs/manual/system#where-models-run).
 
 The studio serves its API at `http://127.0.0.1:8420`. If that port is taken, it uses the first free port from 8421 to 8440 and keeps it for later launches. The [API page](/docs/manual/system) always shows the address in use.
 
