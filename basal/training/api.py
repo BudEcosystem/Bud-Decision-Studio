@@ -17,6 +17,11 @@ MAX_UPLOAD = 200 * 1024 * 1024
 
 def _settings() -> dict:
     srv = sys.modules.get("basal.server")
+    if srv is None:
+        # The desktop app starts python -m basal.server, which registers the server as __main__.
+        main = sys.modules.get("__main__")
+        if getattr(getattr(main, "__spec__", None), "name", None) == "basal.server":
+            srv = main
     return getattr(srv, "SETTINGS", {}) if srv else {}
 
 

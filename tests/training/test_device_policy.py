@@ -1,5 +1,7 @@
 """The device policy (docs/trainer/ARCHITECTURE.md section 8) for hardware this machine doesn't have, by simulating what
 PyTorch reports on each: tier, precision and optimizer settings. The real GB10 path is exercised by every job."""
+import importlib
+import runpy
 import sys
 import types
 
@@ -86,3 +88,70 @@ def test_manager_gate_on_cpu_backend(monkeypatch):
     ok, why, _ = manager.enabled({})
     assert not ok and "needs a GPU" in why
     manager._probe.clear()
+
+
+@pytest.mark.parametrize("launch", ["import", "__main__"])
+@pytest.mark.parametrize("tier", ["on", "experimental"])
+def test_training_api_respects_experimental_setting(monkeypatch, tmp_path, launch, tier):
+    from fastapi.testclient import TestClient
+    from basal import hub
+    from basal.training import manager
+
+    profile = {"ok": True, "kind": "mps", "tier": tier, "name": "Apple GPU", "unified": True,
+               "available_gb": 100}
+    monkeypatch.setattr(manager, "probe", lambda **kw: profile)
+    monkeypatch.setattr(hub, "model_status", lambda spec: {"complete": spec.id == "kev-4b"})
+    meta = {"id": "abcdef123456", "report": {"labelled_answers": 100}}
+    monkeypatch.setattr(manager, "dataset", lambda ds_id: meta)
+    started = []
+
+    def start(model_id, ds_id, name):
+        started.append((model_id, ds_id, name))
+        return {"id": "test-job"}
+
+    monkeypatch.setattr(manager, "start", start)
+
+    def check(app, **kw):
+        srv = sys.modules["__main__" if launch == "__main__" else "basal.server"]
+        monkeypatch.setattr(srv, "SETTINGS_FILE", tmp_path / "settings.json")
+        monkeypatch.setattr(srv, "SETTINGS", {**srv.SETTINGS, "experimental_training": False})
+        # No lifespan: no background workers or model metadata downloads are needed.
+        client = TestClient(app, base_url="http://127.0.0.1", headers={"X-Basal-Client": "1"})
+        try:
+            for step, opt_in in enumerate((False, True, False)):
+                if step:
+                    response = client.post("/api/settings", json={"experimental_training": opt_in})
+                    assert response.status_code == 200
+                    assert response.json()["experimental_training"] is opt_in
+                caps = client.get("/api/training/capabilities").json()
+                assert caps["enabled"] is (tier == "on" or opt_in)
+                kev = next(c for c in caps["models"] if c["id"] == "kev-4b")
+                assert kev["trainable"] is opt_in, kev["reason"]
+                data = client.get(f"/api/training/datasets/{meta['id']}").json()
+                assert (data["recommended"] or {}).get("id") == ("kev-4b" if opt_in else None)
+                response = client.post("/api/training/jobs", json={"dataset_id": meta["id"], "model_id": "kev-4b"})
+                assert response.status_code == (200 if opt_in else 409), response.text
+            assert started == [("kev-4b", meta["id"], "")]
+            if launch == "__main__":
+                assert "basal.server" not in sys.modules
+        finally:
+            client.close()
+
+    if launch == "__main__":
+        import uvicorn
+        monkeypatch.delitem(sys.modules, "basal.server", raising=False)
+        monkeypatch.setattr(sys, "argv", ["basal.server"])
+        monkeypatch.setattr(uvicorn, "run", check)
+        runpy.run_module("basal.server", run_name="__main__", alter_sys=True)
+    else:
+        check(importlib.import_module("basal.server").app)
+
+
+@pytest.mark.parametrize("main_spec", [None, types.SimpleNamespace(name="another.module")])
+def test_training_settings_ignore_unrelated_main(monkeypatch, main_spec):
+    from basal.training import api
+    monkeypatch.delitem(sys.modules, "basal.server", raising=False)
+    monkeypatch.setitem(sys.modules, "__main__", types.SimpleNamespace(
+        __spec__=main_spec, SETTINGS={"experimental_training": True}))
+    assert api._settings() == {}
+    assert "basal.server" not in sys.modules
