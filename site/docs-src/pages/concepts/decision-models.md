@@ -1,6 +1,6 @@
 ---
 title: Decision models
-description: What a decision model is, how it differs from a chat model, what it reads, and the eleven models Bud Decision Studio runs.
+description: What a decision model is, how it differs from a chat model, what it reads, and the sixteen models Bud Decision Studio runs.
 lead: A decision model reads a situation and the questions you ask about it, and returns a probability for every answer you allowed. It never writes free text, so its output is always one of your options, with a number that says how sure it is.
 ---
 
@@ -95,7 +95,7 @@ last_observation: v2.14 changed the payment client retry policy.
 ```
 :::
 
-## The eleven models
+## The sixteen models
 
 Every model below speaks the same request format and returns answers in the same shape, so you can switch models without changing code. They differ in size, speed, what they read and how many options they handle.
 
@@ -107,13 +107,18 @@ Every model below speaks the same request format and returns answers in the same
 | Laya Typed-Decisions | `laya-typed-decisions` | 421M | 1.2 GB | text | 20 | 1,024 | Invoices, security and support workflows |
 | Kev 0.5B | `kev-0.5b` | 0.5B | 1.3 GB | text | 255 | 8,192 | Learning how the architecture works |
 | GLiNER2.5 Decide | `gliner2.5-decide` | 340M | 2.0 GB | text | 64 | 2,048 | Operational labels; fast on a processor |
+| Strands Decider 2B | `strands-decider-2b-v1` | 2B | 5.5 GB | text | 255 | 4,096 | Checking an AI agent's next step; runs on a processor |
+| Strands Decider Gemma 4 E2B | `strands-decider-gemma4-e2b-v1` | 2B | 9 GB | text | 255 | 4,096 | Code changes and agent next-step checks where memory is tightest |
 | Intern-Decision 4B | `intern-decision-4b` | 4B | 10 GB | text, images | 62 | 8,192 | The best all-rounder |
 | Kev 4B | `kev-4b` | 4B | 9.5 GB | text | 255 | 8,192 | Careful and well calibrated; long policies |
 | Lev | `lev` | 4B | 9.5 GB | text | 500 | 8,192 | Hundreds of options per question |
+| Strands Decider Gemma 4 E4B | `strands-decider-gemma4-e4b-v1` | 4B | 15 GB | text | 255 | 4,096 | Agent tool calls, code changes and policies on a shared GPU |
 | CLM 8B | `clm-v0.1-8b` | 8B | 17 GB | text | 1,000 | 2,048 | Agent actions; ranking many candidates |
+| Strands Decider Gemma 4 12B | `strands-decider-gemma4-12b-v1` | 12B | 23 GB | text | 255 | 4,096 | Long policies and code review; the best calibrated Strands model under 24 GB |
 | Jev-Omni | `jev-omni` | 12B | 26 GB | text, images, audio, video | 256 | 8,192 | The hardest questions; needs an NVIDIA GPU |
+| Strands Decider Gemma 4 26B-A4B | `strands-decider-gemma4-26b-a4b-v1` | 26B | 51 GB | text | 255 | 4,096 | The most accurate Strands model; needs about 51 GB of GPU memory |
 
-All eleven answer up to 64 questions in one pass, except Intern-Decision 4B, which answers up to 16. Jev-Omni is the only one that may need more than one pass for a long list of questions. The Models page in the app shows each model's published results, its license and the examples it was checked on; see [Models](/docs/manual/models).
+All sixteen answer up to 64 questions in one pass, except Intern-Decision 4B, which answers up to 16. Jev-Omni is the only one that may need more than one pass for a long list of questions. The Models page in the app shows each model's published results, its license and the examples it was checked on; see [Models](/docs/manual/models).
 
 ## Limits are checked before the model runs
 

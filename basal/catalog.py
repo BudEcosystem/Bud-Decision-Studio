@@ -198,6 +198,45 @@ CATALOG: list[ModelSpec] = [
         load_options=(DEVICE,),
     ),
     ModelSpec(
+        id="strands-decider-2b-v1", name="Strands Decider 2B", maker="Strands Agents", adapter="strands",
+        repo=Repo("StrandsAgents/strands-decider-2B-qwen3.5-v1-2610", exclude=("eval/*", "training/*"), size_gb=0.23, likes=5),
+        base=Repo("Qwen/Qwen3.5-2B-Base", size_gb=4.57, likes=103),
+        params="2B", memory_gb=5.5, speed="fast",
+        tagline="A small decision model built for AI agents.",
+        summary="A LoRA adapter and pointer head on Qwen3.5-2B-Base from the Strands Agents team at AWS. The state is read "
+                "once and every question branches off it in isolation, so asking ten questions costs little more than one. "
+                "Ships with a calibration temperature fitted per question type and an open, reproducible training recipe.",
+        good_for=("Checking an agent's tool calls and routing its next step", "Intent, topic and policy checks on short text",
+                  "Multi-hop questions over documents (0.83 on held-out HotpotQA)", "Choices with up to 255 options"),
+        watch_out=("Reads the document more than the question: phrase the question so the obvious reading is the intended one",
+                   "Long, multi-step documents are its weak spot", "Scales and yes/no questions unlike its training mix transfer poorly",
+                   "4,096-token context; English training data"),
+        languages="English", max_options=255, context_tokens=4096,
+        headline_metric="180 of 231 JevBench tasks, Brier 0.280; same answers on CPU and GPU",
+        devices=("cuda", "mps", "cpu"),
+        load_options=(DEVICE, _ctx(4096, 4096)),
+    ),
+    ModelSpec(
+        id="strands-decider-gemma4-e2b-v1", name="Strands Decider Gemma 4 E2B", maker="Strands Agents", adapter="strands",
+        repo=Repo("StrandsAgents/strands-decider-E2B-gemma4-v1-2610", exclude=("eval/*",), size_gb=0.33, likes=5),
+        base=Repo("google/gemma-4-E2B-it", size_gb=10.28, likes=1073),
+        params="2B", memory_gb=9.0, speed="fast",
+        tagline="The smallest Strands Decider on Gemma 4.",
+        summary="The same adapter and pointer head as Strands Decider 2B, trained on Gemma 4 E2B with 135,602 rows including "
+                "12,263 code tasks. It matches the 2B on JevBench (180 of 231) and adds the code training the Qwen3.5 model "
+                "lacks, for about 9 GB of memory. Gemma 4 E2B runs 2B effective parameters; the full checkpoint is about 5B "
+                "once per-layer embeddings are counted, which is why it needs more memory than other 2B models.",
+        good_for=("Code review, commit and test decisions (0.77 on held-out code tasks)", "Checking an agent's tool calls",
+                  "Intent, topic and policy checks", "Choices with up to 255 options"),
+        watch_out=("Text only: the Gemma 4 models do not read images", "Least calibrated of the Strands family (Brier 0.313)",
+                   "Long, multi-step documents are its weak spot",
+                   "Scales and yes/no questions unlike its training mix transfer poorly", "4,096-token context as served"),
+        languages="English", max_options=255, context_tokens=4096,
+        headline_metric="180 of 231 JevBench tasks, Brier 0.313; 102 ms per question on an H100",
+        devices=("cuda", "mps", "cpu"),
+        load_options=(DEVICE, _ctx(4096, 4096)),
+    ),
+    ModelSpec(
         id="intern-decision-4b", name="Intern-Decision 4B", maker="InternLM (Shanghai AI Lab)", adapter="intern",
         repo=Repo("internlm/Intern-Decision-4B", size_gb=9.11, likes=67),
         params="4B", memory_gb=10.0, speed="fast",
@@ -252,6 +291,25 @@ CATALOG: list[ModelSpec] = [
         load_options=(DEVICE,),
     ),
     ModelSpec(
+        id="strands-decider-gemma4-e4b-v1", name="Strands Decider Gemma 4 E4B", maker="Strands Agents", adapter="strands",
+        repo=Repo("StrandsAgents/strands-decider-E4B-gemma4-v1-2610", exclude=("eval/*",), size_gb=0.47, likes=3),
+        base=Repo("google/gemma-4-E4B-it", size_gb=16.02, likes=1708),
+        params="4B", memory_gb=15.0, speed="fast",
+        tagline="Strands Decider on Gemma 4, for a shared GPU.",
+        summary="The same adapter and pointer head as Strands Decider 2B, trained on Gemma 4 E4B with 135,602 rows including "
+                "12,263 code tasks. Better calibrated than the 2B (Brier 0.243 against 0.280) and the Strands team's pick when "
+                "the model must share one GPU with other work. Gemma 4 E4B runs 4B effective parameters; the full checkpoint "
+                "is about 8B once per-layer embeddings are counted, which is why it needs more memory than other 4B models.",
+        good_for=("Code review, commit and test decisions (0.82 on held-out code tasks)", "Checking an agent's tool calls",
+                  "Intent, topic and policy checks", "Choices with up to 255 options"),
+        watch_out=("Text only: the Gemma 4 models do not read images", "Long, multi-step documents are its weak spot",
+                   "Scales and yes/no questions unlike its training mix transfer poorly", "4,096-token context as served"),
+        languages="English", max_options=255, context_tokens=4096,
+        headline_metric="187 of 231 JevBench tasks, Brier 0.243; 139 ms per question on an H100",
+        devices=("cuda", "mps", "cpu"),
+        load_options=(DEVICE, _ctx(4096, 4096)),
+    ),
+    ModelSpec(
         id="clm-v0.1-8b", name="CLM 8B", maker="Contrastive LM (Stanford)", adapter="clm",
         repo=Repo("Contrastive-LM/CLM-v0.1-8B", exclude=("assets/*",), size_gb=0.08, likes=519),
         base=Repo("Qwen/Qwen3-8B", size_gb=16.40, likes=2061),
@@ -270,6 +328,24 @@ CATALOG: list[ModelSpec] = [
         load_options=(DEVICE,),
     ),
     ModelSpec(
+        id="strands-decider-gemma4-12b-v1", name="Strands Decider Gemma 4 12B", maker="Strands Agents", adapter="strands",
+        repo=Repo("StrandsAgents/strands-decider-12B-gemma4-v1-2610", exclude=("eval/*",), size_gb=0.84, likes=2),
+        base=Repo("google/gemma-4-12B-it", size_gb=23.95, likes=1660),
+        params="12B", memory_gb=23.0, speed="moderate",
+        tagline="The most accurate Strands Decider under 24 GB.",
+        summary="Strands Decider's adapter and pointer head on Gemma 4 12B. The best calibrated of the family that fits a 24 GB "
+                "GPU (JevBench Brier 0.173, against 0.280 for the 2B) and among the strongest on code tasks, at the cost of a "
+                "24 GB download and about 23 GB of memory.",
+        good_for=("Hard text decisions where accuracy matters most", "Code review, commit and test decisions (0.87 on held-out code tasks)",
+                  "Long policies with exceptions and precedence", "Checking an agent's tool calls"),
+        watch_out=("Needs about 23 GB of GPU memory; slow on a processor", "Text only: the Gemma 4 models do not read images",
+                   "Scales and yes/no questions unlike its training mix transfer poorly", "4,096-token context as served"),
+        languages="English", max_options=255, context_tokens=4096,
+        headline_metric="200 of 231 JevBench tasks, Brier 0.173; 136 ms per question on an H100",
+        devices=("cuda", "mps", "cpu"),
+        load_options=(DEVICE, _ctx(4096, 4096)),
+    ),
+    ModelSpec(
         id="jev-omni", name="Jev-Omni", maker="akhilaaa3", adapter="jev_omni",
         repo=Repo("akhilaaa3/Jev-Omni", exclude=("assets/*",), size_gb=23.96, likes=310),
         params="12B", memory_gb=26.0, speed="heavy", one_pass=False,
@@ -284,6 +360,26 @@ CATALOG: list[ModelSpec] = [
         headline_metric="87.6% on DecisionBench Medium; calibration error 0.04",
         badge="Multimodal", needs_gpu=True, devices=("cuda",),
         load_options=(DEVICE,),
+    ),
+    ModelSpec(
+        id="strands-decider-gemma4-26b-a4b-v1", name="Strands Decider Gemma 4 26B-A4B", maker="Strands Agents", adapter="strands",
+        repo=Repo("StrandsAgents/strands-decider-26B-A4B-gemma4-v1-2610", exclude=("eval/*",), size_gb=0.27, likes=2),
+        base=Repo("google/gemma-4-26B-A4B-it", size_gb=51.64, likes=1703),
+        params="26B", memory_gb=51.0, speed="heavy",
+        tagline="The most accurate Strands Decider; needs a large GPU.",
+        summary="Strands Decider's adapter and pointer head on Gemma 4 26B-A4B, a mixture-of-experts model with 26B parameters "
+                "of which about 4B are active per token. The most accurate and best calibrated of the family (207 of 231 "
+                "JevBench tasks, Brier 0.162), at the cost of a 52 GB download, about 51 GB of GPU memory and roughly twice "
+                "the 12B's latency.",
+        good_for=("Hard text decisions where accuracy matters most", "Code review, commit and test decisions (0.86 on held-out code tasks)",
+                  "Long policies with exceptions and precedence", "Checking an agent's tool calls"),
+        watch_out=("Needs about 51 GB of GPU memory (an 80 GB card); impractical on a processor",
+                   "About twice the 12B's latency for seven more JevBench tasks right", "Text only: the Gemma 4 models do not read images",
+                   "Scales and yes/no questions unlike its training mix transfer poorly", "4,096-token context as served"),
+        languages="English", max_options=255, context_tokens=4096,
+        headline_metric="207 of 231 JevBench tasks, Brier 0.162; 245 ms per question on an H100",
+        badge="Best calibrated", devices=("cuda", "mps", "cpu"),
+        load_options=(DEVICE, _ctx(4096, 4096)),
     ),
 ]
 

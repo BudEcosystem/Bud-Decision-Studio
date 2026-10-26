@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Decision models · Bud Decision Studio Docs</title>
-  <meta name="description" content="What a decision model is, how it differs from a chat model, what it reads, and the eleven models Bud Decision Studio runs.">
+  <meta name="description" content="What a decision model is, how it differs from a chat model, what it reads, and the sixteen models Bud Decision Studio runs.">
   <meta name="theme-color" content="#0F0C17">
   <meta property="og:title" content="Decision models · Bud Decision Studio">
-  <meta property="og:description" content="What a decision model is, how it differs from a chat model, what it reads, and the eleven models Bud Decision Studio runs.">
+  <meta property="og:description" content="What a decision model is, how it differs from a chat model, what it reads, and the sixteen models Bud Decision Studio runs.">
   <meta property="og:type" content="article">
   <link rel="icon" type="image/png" href="../../assets/brand/favicon.png">
   <link rel="preload" href="../../assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
@@ -32,7 +32,7 @@
   </div>
 </header>
 <div class="docs-shell">
-<aside class="docs-side" id="docs-side" aria-label="Documentation"><div class="side-in"><div class="side-sec"><p class="side-h">Get started</p><a href="../../docs/index.html">Introduction</a><a href="../../docs/install.html">Installation</a><a href="../../docs/quickstart.html">Quickstart</a></div><div class="side-sec"><p class="side-h">User manual</p><a href="../../docs/manual/index.html">The app at a glance</a><a href="../../docs/manual/playground.html">Playground</a><a href="../../docs/manual/templates.html">Templates</a><a href="../../docs/manual/history.html">History</a><a href="../../docs/manual/models.html">Models</a><a href="../../docs/manual/evaluate.html">Evaluate</a><a href="../../docs/manual/train.html">Train</a><a href="../../docs/manual/system.html">API, Learn and System</a></div><div class="side-sec"><p class="side-h">Concepts</p><a href="../../docs/concepts/decision-models.html" aria-current=page>Decision models</a><nav class="side-toc" aria-label="On this page"><a href="#what-a-decision-model-does">What a decision model does</a><a href="#how-it-differs-from-a-chat-model">How it differs from a chat model</a><a href="#the-situation">The situation</a><a href="#the-eleven-models">The eleven models</a><a href="#limits-are-checked-before-the-model-runs">Limits are checked before the model runs</a><a href="#how-the-studio-runs-a-model">How the studio runs a model</a><a href="#when-to-use-one">When to use one</a></nav><a href="../../docs/concepts/question-types.html">The six question types</a><a href="../../docs/concepts/acting.html">Probabilities, certainty and acting</a><a href="../../docs/concepts/templates.html">Templates and versions</a><a href="../../docs/concepts/history.html">History and privacy</a><a href="../../docs/concepts/fine-tuning.html">Fine-tuning and its safeguards</a></div><div class="side-sec"><p class="side-h">Guides</p><a href="../../docs/guides/support-triage.html">Build a support-triage template</a><a href="../../docs/guides/from-code.html">Call the studio from your code</a><a href="../../docs/guides/improve.html">Improve a template safely</a><a href="../../docs/guides/teach.html">Teach a model your own decisions</a><a href="../../docs/guides/agents.html">Let an agent choose its next action</a><a href="../../docs/guides/media.html">Decide about images, audio and video</a><a href="../../docs/guides/migrate.html">Move from Jev or a gateway</a></div><div class="side-sec"><p class="side-h">API reference</p><a href="../../docs/api/index.html">Overview</a><a href="../../docs/api/decisions.html">Decisions</a><a href="../../docs/api/history.html">History, feedback and statistics</a><a href="../../docs/api/templates.html">Templates</a><a href="../../docs/api/examples.html">Test examples</a><a href="../../docs/api/resources.html">Files, models and settings</a><a href="../../docs/api/training.html">Training and trained models</a><a href="../../docs/api/systemone.html">TypeSafe and gateway formats</a><a href="../../docs/api/errors.html">Errors</a></div><div class="side-sec"><p class="side-h">Developers</p><a href="../../docs/dev/architecture.html">Architecture</a><a href="../../docs/dev/source.html">Run from source</a><a href="../../docs/dev/adding-a-model.html">Add a model</a><a href="../../docs/dev/trainer.html">The trainer</a><a href="../../docs/dev/storage.html">Data and storage</a><a href="../../docs/dev/testing.html">Testing</a><a href="../../docs/dev/desktop.html">Desktop app and releases</a></div><div class="side-sec"><p class="side-h">Help</p><a href="../../docs/troubleshooting.html">Troubleshooting</a><a href="../../docs/faq.html">FAQ</a><a href="../../docs/changelog.html">Changelog</a></div></div></aside>
+<aside class="docs-side" id="docs-side" aria-label="Documentation"><div class="side-in"><div class="side-sec"><p class="side-h">Get started</p><a href="../../docs/index.html">Introduction</a><a href="../../docs/install.html">Installation</a><a href="../../docs/quickstart.html">Quickstart</a></div><div class="side-sec"><p class="side-h">User manual</p><a href="../../docs/manual/index.html">The app at a glance</a><a href="../../docs/manual/playground.html">Playground</a><a href="../../docs/manual/templates.html">Templates</a><a href="../../docs/manual/history.html">History</a><a href="../../docs/manual/models.html">Models</a><a href="../../docs/manual/evaluate.html">Evaluate</a><a href="../../docs/manual/train.html">Train</a><a href="../../docs/manual/system.html">API, Learn and System</a></div><div class="side-sec"><p class="side-h">Concepts</p><a href="../../docs/concepts/decision-models.html" aria-current=page>Decision models</a><nav class="side-toc" aria-label="On this page"><a href="#what-a-decision-model-does">What a decision model does</a><a href="#how-it-differs-from-a-chat-model">How it differs from a chat model</a><a href="#the-situation">The situation</a><a href="#the-sixteen-models">The sixteen models</a><a href="#limits-are-checked-before-the-model-runs">Limits are checked before the model runs</a><a href="#how-the-studio-runs-a-model">How the studio runs a model</a><a href="#when-to-use-one">When to use one</a></nav><a href="../../docs/concepts/question-types.html">The six question types</a><a href="../../docs/concepts/acting.html">Probabilities, certainty and acting</a><a href="../../docs/concepts/templates.html">Templates and versions</a><a href="../../docs/concepts/history.html">History and privacy</a><a href="../../docs/concepts/fine-tuning.html">Fine-tuning and its safeguards</a></div><div class="side-sec"><p class="side-h">Guides</p><a href="../../docs/guides/support-triage.html">Build a support-triage template</a><a href="../../docs/guides/from-code.html">Call the studio from your code</a><a href="../../docs/guides/improve.html">Improve a template safely</a><a href="../../docs/guides/teach.html">Teach a model your own decisions</a><a href="../../docs/guides/agents.html">Let an agent choose its next action</a><a href="../../docs/guides/media.html">Decide about images, audio and video</a><a href="../../docs/guides/migrate.html">Move from Jev or a gateway</a></div><div class="side-sec"><p class="side-h">API reference</p><a href="../../docs/api/index.html">Overview</a><a href="../../docs/api/decisions.html">Decisions</a><a href="../../docs/api/history.html">History, feedback and statistics</a><a href="../../docs/api/templates.html">Templates</a><a href="../../docs/api/examples.html">Test examples</a><a href="../../docs/api/resources.html">Files, models and settings</a><a href="../../docs/api/training.html">Training and trained models</a><a href="../../docs/api/systemone.html">TypeSafe and gateway formats</a><a href="../../docs/api/errors.html">Errors</a></div><div class="side-sec"><p class="side-h">Developers</p><a href="../../docs/dev/architecture.html">Architecture</a><a href="../../docs/dev/source.html">Run from source</a><a href="../../docs/dev/adding-a-model.html">Add a model</a><a href="../../docs/dev/trainer.html">The trainer</a><a href="../../docs/dev/storage.html">Data and storage</a><a href="../../docs/dev/testing.html">Testing</a><a href="../../docs/dev/desktop.html">Desktop app and releases</a></div><div class="side-sec"><p class="side-h">Help</p><a href="../../docs/troubleshooting.html">Troubleshooting</a><a href="../../docs/faq.html">FAQ</a><a href="../../docs/changelog.html">Changelog</a></div></div></aside>
 <div class="side-scrim" hidden></div>
 <main class="docs-main" id="main">
   <article class="prose">
@@ -98,7 +98,7 @@
 <p>The state can be plain text, a JSON object or a JSON array. The studio turns JSON into readable text before the model sees it: field names become labels, nested fields are indented, and list items get a dash. Naming fields well (<code>last_observation</code>, not <code>obs</code>) therefore helps the model.</p>
 <p>The example on the right is an agent's state from the <a href="../../docs/guides/agents.html">agent guide</a>, and the text the model actually read. Each model can read a limited amount of text, its <strong>context</strong>: from 512 tokens for Laya to 8,192 for the larger models (a token is roughly four characters of English). Longer states are cut, and the studio warns you with <code>state_may_be_truncated</code>.</p>
 <p>Images, audio and video go beside the state, not inside it. Two models read them; see <a href="../../docs/guides/media.html">Decide about images, audio and video</a>.</p></div><div class="dsec-code"><div class="dsec-pin"><div class="console dc" data-tabs><div class="dc-head"><span class="dc-title">What the model reads</span></div><div class="console-bar"><span class="dc-lang">State</span><button class="copy" type="button" data-copy aria-label="Copy the example"><svg class="ph " viewBox="0 0 256 256" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M216,32H88a8,8,0,0,0-8,8V80H40a8,8,0,0,0-8,8V216a8,8,0,0,0,8,8H168a8,8,0,0,0,8-8V176h40a8,8,0,0,0,8-8V40A8,8,0,0,0,216,32ZM160,208H48V96H160Zm48-48H176V88a8,8,0,0,0-8-8H96V48H208Z"/></svg><span>Copy</span></button></div><div class="dc-panel" role="group" id="c1-p0"><pre class="hl" tabindex="0"><code class="lang-json"><span class="ln"><span class="p">{</span></span><span class="ln" style="--i:2"><span class="w">  </span><span class="nt">"goal"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Find out why checkout latency doubled since yesterday"</span><span class="p">,</span></span><span class="ln" style="--i:2"><span class="w">  </span><span class="nt">"done_so_far"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span></span><span class="ln" style="--i:4"><span class="w">    </span><span class="s2">"Opened the service dashboard: p95 latency 840 ms (was 410 ms)"</span><span class="p">,</span></span><span class="ln" style="--i:4"><span class="w">    </span><span class="s2">"Checked recent deploys: checkout v2.14 went out 19 hours ago"</span></span><span class="ln" style="--i:2"><span class="w">  </span><span class="p">],</span></span><span class="ln" style="--i:2"><span class="w">  </span><span class="nt">"last_observation"</span><span class="p">:</span><span class="w"> </span><span class="s2">"v2.14 changed the payment client retry policy."</span></span><span class="ln"><span class="p">}</span></span></code></pre></div><div class="console-split"><span>Output</span></div><pre class="hl dc-resp" tabindex="0"><code class="lang-text"><span class="ln">goal: Find out why checkout latency doubled since yesterday</span><span class="ln">done_so_far:</span><span class="ln" style="--i:2">  - Opened the service dashboard: p95 latency 840 ms (was 410 ms)</span><span class="ln" style="--i:2">  - Checked recent deploys: checkout v2.14 went out 19 hours ago</span><span class="ln">last_observation: v2.14 changed the payment client retry policy.</span></code></pre></div></div></div></section>
-<section class="dsec"><div class="dsec-text"><h2 id="the-eleven-models">The eleven models<a class="anchor" href="#the-eleven-models" title="Link to this section">#</a></h2>
+<section class="dsec"><div class="dsec-text"><h2 id="the-sixteen-models">The sixteen models<a class="anchor" href="#the-sixteen-models" title="Link to this section">#</a></h2>
 <p>Every model below speaks the same request format and returns answers in the same shape, so you can switch models without changing code. They differ in size, speed, what they read and how many options they handle.</p>
 <div class="table-wrap"><table>
 <thead>
@@ -175,6 +175,26 @@
 <td>Operational labels; fast on a processor</td>
 </tr>
 <tr>
+<td>Strands Decider 2B</td>
+<td><code>strands-decider-2b-v1</code></td>
+<td>2B</td>
+<td>5.5 GB</td>
+<td>text</td>
+<td>255</td>
+<td>4,096</td>
+<td>Checking an AI agent's next step; runs on a processor</td>
+</tr>
+<tr>
+<td>Strands Decider Gemma 4 E2B</td>
+<td><code>strands-<wbr>decider-<wbr>gemma4-<wbr>e2b-<wbr>v1</code></td>
+<td>2B</td>
+<td>9 GB</td>
+<td>text</td>
+<td>255</td>
+<td>4,096</td>
+<td>Code changes and agent next-step checks where memory is tightest</td>
+</tr>
+<tr>
 <td>Intern-Decision 4B</td>
 <td><code>intern-decision-4b</code></td>
 <td>4B</td>
@@ -205,6 +225,16 @@
 <td>Hundreds of options per question</td>
 </tr>
 <tr>
+<td>Strands Decider Gemma 4 E4B</td>
+<td><code>strands-<wbr>decider-<wbr>gemma4-<wbr>e4b-<wbr>v1</code></td>
+<td>4B</td>
+<td>15 GB</td>
+<td>text</td>
+<td>255</td>
+<td>4,096</td>
+<td>Agent tool calls, code changes and policies on a shared GPU</td>
+</tr>
+<tr>
 <td>CLM 8B</td>
 <td><code>clm-v0.1-8b</code></td>
 <td>8B</td>
@@ -213,6 +243,16 @@
 <td>1,000</td>
 <td>2,048</td>
 <td>Agent actions; ranking many candidates</td>
+</tr>
+<tr>
+<td>Strands Decider Gemma 4 12B</td>
+<td><code>strands-<wbr>decider-<wbr>gemma4-<wbr>12b-<wbr>v1</code></td>
+<td>12B</td>
+<td>23 GB</td>
+<td>text</td>
+<td>255</td>
+<td>4,096</td>
+<td>Long policies and code review; the best calibrated Strands model under 24 GB</td>
 </tr>
 <tr>
 <td>Jev-Omni</td>
@@ -224,9 +264,19 @@
 <td>8,192</td>
 <td>The hardest questions; needs an NVIDIA GPU</td>
 </tr>
+<tr>
+<td>Strands Decider Gemma 4 26B-A4B</td>
+<td><code>strands-<wbr>decider-<wbr>gemma4-<wbr>26b-<wbr>a4b-<wbr>v1</code></td>
+<td>26B</td>
+<td>51 GB</td>
+<td>text</td>
+<td>255</td>
+<td>4,096</td>
+<td>The most accurate Strands model; needs about 51 GB of GPU memory</td>
+</tr>
 </tbody>
 </table></div>
-<p>All eleven answer up to 64 questions in one pass, except Intern-Decision 4B, which answers up to 16. Jev-Omni is the only one that may need more than one pass for a long list of questions. The Models page in the app shows each model's published results, its license and the examples it was checked on; see <a href="../../docs/manual/models.html">Models</a>.</p></div></section>
+<p>All sixteen answer up to 64 questions in one pass, except Intern-Decision 4B, which answers up to 16. Jev-Omni is the only one that may need more than one pass for a long list of questions. The Models page in the app shows each model's published results, its license and the examples it was checked on; see <a href="../../docs/manual/models.html">Models</a>.</p></div></section>
 <section class="dsec has-code"><div class="dsec-text"><h2 id="limits-are-checked-before-the-model-runs">Limits are checked before the model runs<a class="anchor" href="#limits-are-checked-before-the-model-runs" title="Link to this section">#</a></h2>
 <p>The studio knows each model's limits and checks your request against the model that will answer, before loading or running anything. A request the model cannot handle gets one <code>400 model_incompatible</code> error that lists every problem: an unsupported question type, too many options, too many questions, or media the model cannot read.</p>
 <p>The example on the right sends an image to Laya, which reads text only.</p></div><div class="dsec-code"><div class="dsec-pin"><div class="console dc" data-tabs><div class="dc-head"><span class="method post">POST</span><code>/v1/studio/decisions</code></div><div class="console-bar"><span class="dc-lang">curl</span><button class="copy" type="button" data-copy aria-label="Copy the example"><svg class="ph " viewBox="0 0 256 256" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M216,32H88a8,8,0,0,0-8,8V80H40a8,8,0,0,0-8,8V216a8,8,0,0,0,8,8H168a8,8,0,0,0,8-8V176h40a8,8,0,0,0,8-8V40A8,8,0,0,0,216,32ZM160,208H48V96H160Zm48-48H176V88a8,8,0,0,0-8-8H96V48H208Z"/></svg><span>Copy</span></button></div><div class="dc-panel" role="group" id="c2-p0"><pre class="hl" tabindex="0"><code class="lang-bash"><span class="ln">curl<span class="w"> </span>-s<span class="w"> </span>http://127.0.0.1:8420/v1/studio/decisions<span class="w"> </span>-d<span class="w"> </span><span class="s1">'{</span></span><span class="ln" style="--i:2"><span class="s1">  "model": "laya",</span></span><span class="ln" style="--i:2"><span class="s1">  "state": "Proof of purchase.",</span></span><span class="ln" style="--i:2"><span class="s1">  "questions": {"shows_item": {"type": "noul", "instructions": "Does the receipt list olive oil?"}},</span></span><span class="ln" style="--i:2"><span class="s1">  "media": [{"type": "image", "file_id": "file_01M3TF8QS1XJT4SYYEDJRPDZ7A"}]</span></span><span class="ln"><span class="s1">}'</span></span></code></pre></div><div class="console-split"><span>Response</span><span class="dc-status err">400 Bad Request</span></div><pre class="hl dc-resp" tabindex="0"><code class="lang-json"><span class="ln"><span class="p">{</span></span><span class="ln" style="--i:2"><span class="w">  </span><span class="nt">"error"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span></span><span class="ln" style="--i:4"><span class="w">    </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"invalid_request_error"</span><span class="p">,</span></span><span class="ln" style="--i:4"><span class="w">    </span><span class="nt">"code"</span><span class="p">:</span><span class="w"> </span><span class="s2">"model_incompatible"</span><span class="p">,</span></span><span class="ln" style="--i:4"><span class="w">    </span><span class="nt">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Laya cannot run this decision: Laya cannot read image input."</span><span class="p">,</span></span><span class="ln" style="--i:4"><span class="w">    </span><span class="nt">"param"</span><span class="p">:</span><span class="w"> </span><span class="s2">"media"</span><span class="p">,</span></span><span class="ln" style="--i:4"><span class="w">    </span><span class="nt">"details"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span></span><span class="ln" style="--i:6"><span class="w">      </span><span class="p">{</span><span class="nt">"code"</span><span class="p">:</span><span class="w"> </span><span class="s2">"modality_not_supported"</span><span class="p">,</span><span class="w"> </span><span class="nt">"param"</span><span class="p">:</span><span class="w"> </span><span class="s2">"media"</span><span class="p">,</span><span class="w"> </span><span class="nt">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Laya cannot read image input."</span><span class="p">}</span></span><span class="ln" style="--i:4"><span class="w">    </span><span class="p">],</span></span><span class="ln" style="--i:4"><span class="w">    </span><span class="nt">"request_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"req_4db8548f8cc24c208ece026bc9c9ff3c"</span><span class="p">,</span></span><span class="ln" style="--i:4"><span class="w">    </span><span class="nt">"decision_id"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span></span><span class="ln" style="--i:2"><span class="w">  </span><span class="p">}</span></span><span class="ln"><span class="p">}</span></span></code></pre></div></div></div></section>

@@ -85,7 +85,7 @@ A **decision model** does not write text. You give it a **situation** (an email,
 <table>
 <tr>
 <td width="50%"><img src="docs/media/playground.png" alt="Playground"><br><b>Playground.</b> Write a situation and questions (start blank with <b>New</b>, or from an example), press Decide, and read each answer as a chart. The model button (Ctrl+L) loads any model; the JSON and Code tabs show the exact request.</td>
-<td width="50%"><img src="docs/media/models.png" alt="Models"><br><b>Models.</b> Eleven open models in one table: what each is good at, its size, what it reads and its published results next to Jev. Download, load and eject with one click.</td>
+<td width="50%"><img src="docs/media/models.png" alt="Models"><br><b>Models.</b> Sixteen open models in one table: what each is good at, its size, what it reads and its published results next to Jev. Download, load and eject with one click.</td>
 </tr>
 <tr>
 <td><img src="docs/media/evaluate.png" alt="Evaluate"><br><b>Evaluate.</b> Run one question over many labelled examples on several models: a leaderboard, calibration and threshold charts, and a recommendation.</td>
@@ -154,7 +154,7 @@ Every model, trained by the studio itself on an NVIDIA GB10, measured on example
 
 Training needs an NVIDIA RTX 30 series or newer (including the GB10) or an Apple M2 or newer; Intel Arc and Core Ultra, AMD on Linux and older NVIDIA cards are experimental. How it works, what it checks, and every run: [`docs/trainer/README.md`](docs/trainer/README.md) and [`docs/trainer/RESULTS.md`](docs/trainer/RESULTS.md).
 
-## The eleven models
+## The sixteen models
 
 | Model | Size | Good at | Reads |
 |---|---|---|---|
@@ -164,11 +164,16 @@ Training needs an NVIDIA RTX 30 series or newer (including the GB10) or an Apple
 | Laya Typed-Decisions | 421M | invoices, security, support workflows | text |
 | Kev 0.5B | 0.5B | learning how the architecture works | text |
 | GLiNER2.5 Decide | 340M | operational labels; fast on a processor | text |
+| Strands Decider 2B | 2B | checking an AI agent's next step; up to 255 options; runs on a processor | text |
+| Strands Decider Gemma 4 E2B | 2B | code changes and agent next-step checks where memory is tightest | text |
 | Intern-Decision 4B | 4B | best all-rounder | text, images |
 | Kev 4B | 4B | careful and well calibrated; long policies | text |
 | Lev | 4B | hundreds of options per question | text |
+| Strands Decider Gemma 4 E4B | 4B | agent tool calls, code changes and policies on a shared GPU | text |
 | CLM 8B | 8B | agent actions, ranking many candidates | text |
+| Strands Decider Gemma 4 12B | 12B | long policies and code review; the best calibrated Strands model under 24 GB | text |
 | Jev-Omni | 12B | the hardest questions; images, audio and video (needs an NVIDIA GPU) | text, images, audio, video |
+| Strands Decider Gemma 4 26B-A4B | 26B | the most accurate and best calibrated Strands model; needs about 51 GB of GPU memory | text |
 
 **Every model comes with examples made for it**, checked to give the right answers: CLM 8B opens on a web agent choosing its next action, Lev on a question with 77 options, Kev 4B on a refund policy with exceptions, Laya Multilingual on a Japanese message, Jev-Omni on a receipt photo. Choosing a model in the Playground shows its own example (unless you have written your own), and the Models page lists them under **Try it**. `scripts/model-examples.py` checks that each model still answers its examples as intended.
 

@@ -38,9 +38,10 @@ def main() -> int:
     print("Bud Decision Studio environment check\n")
     problems, lines = check_torch()
     print("\n".join(lines))
-    for mod, who in [("transformers", "all Hugging Face models"), ("peft", "Kev, Lev (LoRA adapters)"),
+    for mod, who in [("transformers", "all Hugging Face models"), ("peft", "Kev, Lev, Strands Decider (LoRA adapters)"),
                      ("laya", "Laya family"), ("gliner2", "GLiNER2.5 Decide"), ("lev", "Lev"), ("kev", "Kev family"),
-                     ("clm", "CLM 8B"), ("cv2", "Jev-Omni video"), ("librosa", "Jev-Omni audio"), ("fastapi", "the server")]:
+                     ("clm", "CLM 8B"), ("strands_decider", "Strands Decider family"),
+                     ("cv2", "Jev-Omni video"), ("librosa", "Jev-Omni audio"), ("fastapi", "the server")]:
         try:
             m = importlib.import_module(mod)
             print(f"{OK}{mod} {getattr(m, '__version__', '')}  ({who})")
@@ -49,7 +50,7 @@ def main() -> int:
             print(f"{BAD}{mod} missing: {e}  ({who})")
     try:
         importlib.import_module("fla")
-        print(f"{OK}flash-linear-attention (fast Qwen3.5 kernels for Kev 4B, Lev, Intern-Decision)")
+        print(f"{OK}flash-linear-attention (fast Qwen3.5 kernels for Kev 4B, Lev, Intern-Decision, Strands Decider 2B)")
     except Exception:
         print("  --  flash-linear-attention not installed: Qwen3.5 models use slower reference kernels (optional)")
     print("\nAll good. Start the studio with ./run.sh" if not problems else f"\n{problems} problem(s) found.")

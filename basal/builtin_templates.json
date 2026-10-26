@@ -35,7 +35,9 @@
    "text"
   ],
   "recommended_models": [
-   "laya"
+   "laya",
+   "strands-decider-2b-v1",
+   "strands-decider-gemma4-e2b-v1"
   ]
  },
  {
@@ -474,7 +476,11 @@
    "text"
   ],
   "recommended_models": [
-   "kev-4b"
+   "kev-4b",
+   "strands-decider-gemma4-e2b-v1",
+   "strands-decider-gemma4-e4b-v1",
+   "strands-decider-gemma4-12b-v1",
+   "strands-decider-gemma4-26b-a4b-v1"
   ]
  },
  {
@@ -746,7 +752,10 @@
    "text"
   ],
   "recommended_models": [
-   "clm-v0.1-8b"
+   "clm-v0.1-8b",
+   "strands-decider-gemma4-e4b-v1",
+   "strands-decider-gemma4-12b-v1",
+   "strands-decider-gemma4-26b-a4b-v1"
   ]
  },
  {
@@ -773,7 +782,8 @@
    "text"
   ],
   "recommended_models": [
-   "clm-v0.1-8b"
+   "clm-v0.1-8b",
+   "strands-decider-2b-v1"
   ]
  },
  {
@@ -914,7 +924,9 @@
   "recommended_models": [
    "kev-0.5b",
    "kev-4b",
-   "lev"
+   "lev",
+   "strands-decider-2b-v1",
+   "strands-decider-gemma4-e2b-v1"
   ]
  },
  {
@@ -958,7 +970,10 @@
    "text"
   ],
   "recommended_models": [
-   "kev-4b"
+   "kev-4b",
+   "strands-decider-gemma4-e4b-v1",
+   "strands-decider-gemma4-12b-v1",
+   "strands-decider-gemma4-26b-a4b-v1"
   ]
  },
  {

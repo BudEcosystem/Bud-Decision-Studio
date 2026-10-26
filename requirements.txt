@@ -15,6 +15,9 @@ sentencepiece
 numpy
 # Laya's official runtime
 laya
+# Strands Decider's official runtime. From the code repository, not PyPI: the 0.1.0 release there predates the Gemma 4
+# loader. An archive URL (not git) so installs work on machines without git; pinned to a commit so they are repeatable.
+strands-decider @ https://github.com/strands-labs/strands-decider/archive/ffb7083c108a4054c63edbf1a773de293c667cdd.tar.gz
 # Jev-Omni's media preprocessing (images, audio, video)
 pillow
 opencv-python-headless

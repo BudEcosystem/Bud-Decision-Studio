@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-30",
+  "generated": "2026-10-13",
   "notes": "Publisher numbers are the model makers' own claims. Rows with a 'jev' value are the head-to-heads each source reports; 'independent' rows are third-party. Units follow each source: '%' values are percentages, 'ratio' values are 0–1. Optional fields: model_range/jev_range (source gave a range; model/jev hold the low end), model_display/jev_display (source formatting such as 26/30), checkpoint (which Kev-4B release a row belongs to), proxy_model (score belongs to a relative). jev.independent rows describe Jev alone and use 'value' instead of model/jev.",
   "jev": {
     "name": "Jev 1.13",
@@ -164,6 +164,12 @@
       "url": "https://huggingface.co/akhilaaa3",
       "logo": "logos/akhilaaa3.svg",
       "logo_source": "Hugging Face default generated avatar (no custom avatar)"
+    },
+    "strandsagents": {
+      "name": "Strands Agents",
+      "url": "https://huggingface.co/StrandsAgents",
+      "logo": "logos/strandsagents.png",
+      "logo_source": "Hugging Face org 'Strands Agents' avatar (200x200 PNG); org is not verified. Code: github.com/strands-labs/strands-decider (Apache-2.0)"
     }
   },
   "models": {
@@ -2163,6 +2169,159 @@
       ],
       "headline": "No published head-to-head with Jev: its 60.2% on Fastino's own fast-decisions suite is compared only with other open systems (the 'JevK5' row is not TypeSafe's Jev); the only third-party signal is a GLiNER2 relative's 0.684–0.698 on jabr v2, far below Jev's 0.966."
     },
+    "strands-decider-2b-v1": {
+      "name": "Strands Decider 2B",
+      "maker": "Strands Agents",
+      "maker_id": "strandsagents",
+      "logo": "logos/strandsagents.png",
+      "maker_url": "https://huggingface.co/StrandsAgents",
+      "paper_or_code_url": "https://github.com/strands-labs/strands-decider",
+      "hf_url": "https://huggingface.co/StrandsAgents/strands-decider-2B-qwen3.5-v1-2610",
+      "params": "2B (LoRA r48 adapter + pointer head; checkpoint 0.23 GB on a 4.6 GB base)",
+      "architecture": "Qwen3.5-2B-Base text decoder (hybrid Gated DeltaNet + attention) + LoRA r48 on attention, MLP and DeltaNet projections + pointer head (dim 768): the state is encoded once and its cache is forked across the questions, each a short suffix scored at its own <answer> token; options are scored from their own hidden states, so any number of options. Temperature fitted per question type (noul 1.07, choice 0.86, score 1.83). The Qwen3.5 base is multimodal, but the studio serves text only",
+      "base_model": "Qwen/Qwen3.5-2B-Base (revision b1485b2f)",
+      "training": "246,678 rows in nine parts: 80,449 short classification tasks from public datasets (commercial-use terms only), 12,909 multi-step documents, 24,533 code tasks with execution-checked answers, 96,638 gap-fill rows (tool choice, agent steps, preference, legal and contract text, NLI), 22,168 synthetic rule-application rows, generated documents and answer-adequacy items; distilled from gemma-4-31B-it where its answer matches the gold label; three seeds souped, then calibrated; no Jev outputs used",
+      "benchmarks": [
+        {
+          "suite": "JevBench public",
+          "what": "External decision benchmark: 231 public tasks across easy, standard and hard tiers",
+          "metric": "tasks right",
+          "higher_is_better": true,
+          "model": 0.779,
+          "model_display": "180/231",
+          "unit": "ratio",
+          "conditions": "231 public tasks, window 4,096 tokens; served from the published files on one NVIDIA L4 (2B) or H100 (Gemma 4)",
+          "source": "https://huggingface.co/StrandsAgents/strands-decider-2B-qwen3.5-v1-2610",
+          "note": "Jev 1.13.0 figure from JevBench's published per-task outcomes on the same 231 public tasks (board v1.2 run against the production API, Sept 2026; results/v1.2/jevbench-v1.2-per-task.json in the fstandhartinger/jevbench repository; tiers 48/48 easy, 71/72 standard, 81/111 hard), not a Strands run. Jev was served at its own context limit, Strands at a 4,096-token window. Brier and ECE stay unpaired: the board publishes Jev's calibration only for the hard tier.",
+          "jev": 0.866,
+          "jev_display": "200/231"
+        },
+        {
+          "suite": "JevBench public",
+          "what": "Same tasks; calibration (Brier score of the reported probabilities)",
+          "metric": "Brier",
+          "higher_is_better": false,
+          "model": 0.28,
+          "unit": "ratio",
+          "conditions": "231 public tasks, window 4,096 tokens; served from the published files on one NVIDIA L4 (2B) or H100 (Gemma 4)",
+          "source": "https://huggingface.co/StrandsAgents/strands-decider-2B-qwen3.5-v1-2610"
+        },
+        {
+          "suite": "JevBench public",
+          "what": "Same tasks; calibration (expected calibration error)",
+          "metric": "ECE",
+          "higher_is_better": false,
+          "model": 0.072,
+          "unit": "ratio",
+          "conditions": "231 public tasks, window 4,096 tokens; served from the published files on one NVIDIA L4 (2B) or H100 (Gemma 4)",
+          "source": "https://huggingface.co/StrandsAgents/strands-decider-2B-qwen3.5-v1-2610"
+        },
+        {
+          "suite": "Strands held-out short tasks",
+          "what": "Held-out items from the public classification datasets the recipe trains on (intent, topic, sentiment, NLI, QA)",
+          "metric": "accuracy",
+          "higher_is_better": true,
+          "model": 0.653,
+          "unit": "ratio",
+          "conditions": "6,000 items; the publisher's own held-out split",
+          "source": "https://huggingface.co/StrandsAgents/strands-decider-2B-qwen3.5-v1-2610",
+          "note": "In-distribution: same sources as training, held-out rows"
+        },
+        {
+          "suite": "HotpotQA (held out)",
+          "what": "Multi-hop question answering over two documents; never trained on",
+          "metric": "accuracy",
+          "higher_is_better": true,
+          "model": 0.832,
+          "unit": "ratio",
+          "conditions": "959 items",
+          "source": "https://huggingface.co/StrandsAgents/strands-decider-2B-qwen3.5-v1-2610",
+          "note": "Out-of-distribution: the source is not in the training data"
+        }
+      ]
+    },
+    "strands-decider-gemma4-e2b-v1": {
+      "name": "Strands Decider Gemma 4 E2B",
+      "maker": "Strands Agents",
+      "maker_id": "strandsagents",
+      "logo": "logos/strandsagents.png",
+      "maker_url": "https://huggingface.co/StrandsAgents",
+      "paper_or_code_url": "https://github.com/strands-labs/strands-decider",
+      "hf_url": "https://huggingface.co/StrandsAgents/strands-decider-E2B-gemma4-v1-2610",
+      "params": "2B (LoRA r48 adapter + pointer head; checkpoint 0.33 GB on a 10 GB base)",
+      "architecture": "Gemma 4 E2B instruction-tuned text decoder (2B effective parameters, about 5B with per-layer embeddings) + LoRA r48 on attention and MLP projections + pointer head (dim 768); same shared-state, isolated-question serving as the 2B. Temperature fitted per question type. About 9 GB of GPU memory for the weights in bf16; 102 ms median per JevBench question on one H100. Text only",
+      "base_model": "google/gemma-4-E2B-it (revision 3e22461f)",
+      "training": "135,602 rows: hobson-v21's 123,339 (public classification, multi-step documents, adequacy) plus 12,263 code-task rows; targets are the output distributions of a frozen Qwen3.5-4B teacher with an anchor toward strands-decider-2B-hobson-v19; three seeds of one epoch (4,109 steps) on 8 H100s, souped and calibrated",
+      "benchmarks": [
+        {
+          "suite": "JevBench public",
+          "what": "External decision benchmark: 231 public tasks across easy, standard and hard tiers",
+          "metric": "tasks right",
+          "higher_is_better": true,
+          "model": 0.779,
+          "model_display": "180/231",
+          "unit": "ratio",
+          "conditions": "231 public tasks, window 4,096 tokens; served from the published files on one NVIDIA L4 (2B) or H100 (Gemma 4)",
+          "source": "https://huggingface.co/StrandsAgents/strands-decider-E2B-gemma4-v1-2610",
+          "note": "Jev 1.13.0 figure from JevBench's published per-task outcomes on the same 231 public tasks (board v1.2 run against the production API, Sept 2026; results/v1.2/jevbench-v1.2-per-task.json in the fstandhartinger/jevbench repository; tiers 48/48 easy, 71/72 standard, 81/111 hard), not a Strands run. Jev was served at its own context limit, Strands at a 4,096-token window. Brier and ECE stay unpaired: the board publishes Jev's calibration only for the hard tier.",
+          "jev": 0.866,
+          "jev_display": "200/231"
+        },
+        {
+          "suite": "JevBench public",
+          "what": "Same tasks; calibration (Brier score of the reported probabilities)",
+          "metric": "Brier",
+          "higher_is_better": false,
+          "model": 0.313,
+          "unit": "ratio",
+          "conditions": "231 public tasks, window 4,096 tokens; served from the published files on one NVIDIA L4 (2B) or H100 (Gemma 4)",
+          "source": "https://huggingface.co/StrandsAgents/strands-decider-E2B-gemma4-v1-2610"
+        },
+        {
+          "suite": "JevBench public",
+          "what": "Same tasks; calibration (expected calibration error)",
+          "metric": "ECE",
+          "higher_is_better": false,
+          "model": 0.053,
+          "unit": "ratio",
+          "conditions": "231 public tasks, window 4,096 tokens; served from the published files on one NVIDIA L4 (2B) or H100 (Gemma 4)",
+          "source": "https://huggingface.co/StrandsAgents/strands-decider-E2B-gemma4-v1-2610"
+        },
+        {
+          "suite": "Strands held-out short tasks",
+          "what": "Held-out items from the public classification datasets the recipe trains on (intent, topic, sentiment, NLI, QA)",
+          "metric": "accuracy",
+          "higher_is_better": true,
+          "model": 0.652,
+          "unit": "ratio",
+          "conditions": "6,000 items; the publisher's own held-out split",
+          "source": "https://huggingface.co/StrandsAgents/strands-decider-E2B-gemma4-v1-2610",
+          "note": "In-distribution: same sources as training, held-out rows"
+        },
+        {
+          "suite": "Strands held-out code tasks",
+          "what": "Code review, commit, defect and program-output decisions (CodeReviewer, CommitPackFT, Juliet, CodeContests, generated programs)",
+          "metric": "accuracy",
+          "higher_is_better": true,
+          "model": 0.773,
+          "unit": "ratio",
+          "conditions": "Publisher's held-out code split; figure from the strands-decider README's Gemma 4 table",
+          "source": "https://github.com/strands-labs/strands-decider#gemma-4-models",
+          "note": "In-distribution: same sources as training, held-out rows"
+        },
+        {
+          "suite": "Decision Index 0.2.1",
+          "what": "The decision-model index of the open decision-index kit, balanced skill",
+          "metric": "index",
+          "higher_is_better": true,
+          "model": 29.78,
+          "unit": "points",
+          "conditions": "Window 32,768 tokens",
+          "source": "https://github.com/strands-labs/strands-decider#gemma-4-models",
+          "note": "Index points, not a ratio; the kit's own scale. The publisher measured E2B's Decision Index before fixing a GPU attention-kernel path that affected yes/no answers on multi-question requests, so this figure may be off; single-question results (JevBench) are unaffected"
+        }
+      ]
+    },
     "intern-decision-4b": {
       "name": "Intern-Decision 4B",
       "maker": "InternLM (Shanghai AI Lab)",
@@ -2759,6 +2918,88 @@
       "independent": [],
       "headline": "Run through the same harness on all 13 S1Bench subsets, lev averages 0.689 vs Jev's 0.761 — ahead only on MultiNLI and HelpSteer2 (within noise), far behind on SummEval consistency (0.271 vs 0.812) — and it was slower end to end than Jev's hosted API in the publisher's laptop test."
     },
+    "strands-decider-gemma4-e4b-v1": {
+      "name": "Strands Decider Gemma 4 E4B",
+      "maker": "Strands Agents",
+      "maker_id": "strandsagents",
+      "logo": "logos/strandsagents.png",
+      "maker_url": "https://huggingface.co/StrandsAgents",
+      "paper_or_code_url": "https://github.com/strands-labs/strands-decider",
+      "hf_url": "https://huggingface.co/StrandsAgents/strands-decider-E4B-gemma4-v1-2610",
+      "params": "4B (LoRA r48 adapter + pointer head; checkpoint 0.47 GB on a 16 GB base)",
+      "architecture": "Gemma 4 E4B instruction-tuned text decoder (4B effective parameters, about 8B with per-layer embeddings) + LoRA r48 on attention and MLP projections + pointer head (dim 768); same shared-state, isolated-question serving as the 2B. Temperature fitted per question type. About 15 GB of GPU memory for the weights in bf16; 139 ms median per JevBench question on one H100. Text only",
+      "base_model": "google/gemma-4-E4B-it (revision ee0ef602)",
+      "training": "135,602 rows: hobson-v21's 123,339 (public classification, multi-step documents, adequacy) plus 12,263 code-task rows; targets are the output distributions of a frozen Qwen3.5-4B teacher with an anchor toward strands-decider-2B-hobson-v19; three seeds of one epoch (4,109 steps) on 8 H100s, souped and calibrated",
+      "benchmarks": [
+        {
+          "suite": "JevBench public",
+          "what": "External decision benchmark: 231 public tasks across easy, standard and hard tiers",
+          "metric": "tasks right",
+          "higher_is_better": true,
+          "model": 0.81,
+          "model_display": "187/231",
+          "unit": "ratio",
+          "conditions": "231 public tasks, window 4,096 tokens; served from the published files on one NVIDIA L4 (2B) or H100 (Gemma 4)",
+          "source": "https://huggingface.co/StrandsAgents/strands-decider-E4B-gemma4-v1-2610",
+          "note": "Jev 1.13.0 figure from JevBench's published per-task outcomes on the same 231 public tasks (board v1.2 run against the production API, Sept 2026; results/v1.2/jevbench-v1.2-per-task.json in the fstandhartinger/jevbench repository; tiers 48/48 easy, 71/72 standard, 81/111 hard), not a Strands run. Jev was served at its own context limit, Strands at a 4,096-token window. Brier and ECE stay unpaired: the board publishes Jev's calibration only for the hard tier.",
+          "jev": 0.866,
+          "jev_display": "200/231"
+        },
+        {
+          "suite": "JevBench public",
+          "what": "Same tasks; calibration (Brier score of the reported probabilities)",
+          "metric": "Brier",
+          "higher_is_better": false,
+          "model": 0.243,
+          "unit": "ratio",
+          "conditions": "231 public tasks, window 4,096 tokens; served from the published files on one NVIDIA L4 (2B) or H100 (Gemma 4)",
+          "source": "https://huggingface.co/StrandsAgents/strands-decider-E4B-gemma4-v1-2610"
+        },
+        {
+          "suite": "JevBench public",
+          "what": "Same tasks; calibration (expected calibration error)",
+          "metric": "ECE",
+          "higher_is_better": false,
+          "model": 0.037,
+          "unit": "ratio",
+          "conditions": "231 public tasks, window 4,096 tokens; served from the published files on one NVIDIA L4 (2B) or H100 (Gemma 4)",
+          "source": "https://huggingface.co/StrandsAgents/strands-decider-E4B-gemma4-v1-2610"
+        },
+        {
+          "suite": "Strands held-out short tasks",
+          "what": "Held-out items from the public classification datasets the recipe trains on (intent, topic, sentiment, NLI, QA)",
+          "metric": "accuracy",
+          "higher_is_better": true,
+          "model": 0.684,
+          "unit": "ratio",
+          "conditions": "6,000 items; the publisher's own held-out split",
+          "source": "https://huggingface.co/StrandsAgents/strands-decider-E4B-gemma4-v1-2610",
+          "note": "In-distribution: same sources as training, held-out rows"
+        },
+        {
+          "suite": "Strands held-out code tasks",
+          "what": "Code review, commit, defect and program-output decisions (CodeReviewer, CommitPackFT, Juliet, CodeContests, generated programs)",
+          "metric": "accuracy",
+          "higher_is_better": true,
+          "model": 0.815,
+          "unit": "ratio",
+          "conditions": "Publisher's held-out code split; figure from the strands-decider README's Gemma 4 table",
+          "source": "https://github.com/strands-labs/strands-decider#gemma-4-models",
+          "note": "In-distribution: same sources as training, held-out rows"
+        },
+        {
+          "suite": "Decision Index 0.2.1",
+          "what": "The decision-model index of the open decision-index kit, balanced skill",
+          "metric": "index",
+          "higher_is_better": true,
+          "model": 39.42,
+          "unit": "points",
+          "conditions": "Window 32,768 tokens",
+          "source": "https://github.com/strands-labs/strands-decider#gemma-4-models",
+          "note": "Index points, not a ratio; the kit's own scale"
+        }
+      ]
+    },
     "clm-v0.1-8b": {
       "name": "CLM 8B",
       "maker": "Contrastive LM (Stanford)",
@@ -3025,6 +3266,88 @@
       ],
       "headline": "Zero-shot, CLM-8B matches Jev on T-Rex and Super Mario but trails on BFCL v4 (95.2% vs 99.2%) and WikiRacing (26/30 vs 30/30) while being 1.6–9× faster; its fine-tuned verifier heads (not this checkpoint) beat Jev on DeepSWE and Terminal-Bench 2.1, but on JevBench's typed decisions it scores far below Jev (composite 1.5 vs 72.1)."
     },
+    "strands-decider-gemma4-12b-v1": {
+      "name": "Strands Decider Gemma 4 12B",
+      "maker": "Strands Agents",
+      "maker_id": "strandsagents",
+      "logo": "logos/strandsagents.png",
+      "maker_url": "https://huggingface.co/StrandsAgents",
+      "paper_or_code_url": "https://github.com/strands-labs/strands-decider",
+      "hf_url": "https://huggingface.co/StrandsAgents/strands-decider-12B-gemma4-v1-2610",
+      "params": "12B (LoRA r48 adapter + pointer head; checkpoint 0.84 GB on a 24 GB base)",
+      "architecture": "Gemma 4 12B instruction-tuned text decoder + LoRA r48 on attention and MLP projections + pointer head (dim 768); same shared-state, isolated-question serving as the 2B. Temperature fitted per question type. About 23 GB of GPU memory for the weights in bf16; 136 ms median per JevBench question on one H100. Text only",
+      "base_model": "google/gemma-4-12B-it (revision 707f0a3b)",
+      "training": "Same recipe and 135,602 rows as the Gemma 4 E4B model (hobson-v21's data plus 12,263 code-task rows), Qwen3.5-4B teacher distributions, three seeds souped and calibrated",
+      "benchmarks": [
+        {
+          "suite": "JevBench public",
+          "what": "External decision benchmark: 231 public tasks across easy, standard and hard tiers",
+          "metric": "tasks right",
+          "higher_is_better": true,
+          "model": 0.866,
+          "model_display": "200/231",
+          "unit": "ratio",
+          "conditions": "231 public tasks, window 4,096 tokens; served from the published files on one NVIDIA L4 (2B) or H100 (Gemma 4)",
+          "source": "https://huggingface.co/StrandsAgents/strands-decider-12B-gemma4-v1-2610",
+          "note": "Jev 1.13.0 figure from JevBench's published per-task outcomes on the same 231 public tasks (board v1.2 run against the production API, Sept 2026; results/v1.2/jevbench-v1.2-per-task.json in the fstandhartinger/jevbench repository; tiers 48/48 easy, 71/72 standard, 81/111 hard), not a Strands run. Jev was served at its own context limit, Strands at a 4,096-token window. Brier and ECE stay unpaired: the board publishes Jev's calibration only for the hard tier.",
+          "jev": 0.866,
+          "jev_display": "200/231"
+        },
+        {
+          "suite": "JevBench public",
+          "what": "Same tasks; calibration (Brier score of the reported probabilities)",
+          "metric": "Brier",
+          "higher_is_better": false,
+          "model": 0.173,
+          "unit": "ratio",
+          "conditions": "231 public tasks, window 4,096 tokens; served from the published files on one NVIDIA L4 (2B) or H100 (Gemma 4)",
+          "source": "https://huggingface.co/StrandsAgents/strands-decider-12B-gemma4-v1-2610"
+        },
+        {
+          "suite": "JevBench public",
+          "what": "Same tasks; calibration (expected calibration error)",
+          "metric": "ECE",
+          "higher_is_better": false,
+          "model": 0.061,
+          "unit": "ratio",
+          "conditions": "231 public tasks, window 4,096 tokens; served from the published files on one NVIDIA L4 (2B) or H100 (Gemma 4)",
+          "source": "https://huggingface.co/StrandsAgents/strands-decider-12B-gemma4-v1-2610"
+        },
+        {
+          "suite": "Strands held-out short tasks",
+          "what": "Held-out items from the public classification datasets the recipe trains on (intent, topic, sentiment, NLI, QA)",
+          "metric": "accuracy",
+          "higher_is_better": true,
+          "model": 0.708,
+          "unit": "ratio",
+          "conditions": "6,000 items; the publisher's own held-out split",
+          "source": "https://huggingface.co/StrandsAgents/strands-decider-12B-gemma4-v1-2610",
+          "note": "In-distribution: same sources as training, held-out rows"
+        },
+        {
+          "suite": "Strands held-out code tasks",
+          "what": "Code review, commit, defect and program-output decisions (CodeReviewer, CommitPackFT, Juliet, CodeContests, generated programs)",
+          "metric": "accuracy",
+          "higher_is_better": true,
+          "model": 0.87,
+          "unit": "ratio",
+          "conditions": "Publisher's held-out code split; figure from the strands-decider README's Gemma 4 table",
+          "source": "https://github.com/strands-labs/strands-decider#gemma-4-models",
+          "note": "In-distribution: same sources as training, held-out rows"
+        },
+        {
+          "suite": "Decision Index 0.2.1",
+          "what": "The decision-model index of the open decision-index kit, balanced skill",
+          "metric": "index",
+          "higher_is_better": true,
+          "model": 47.14,
+          "unit": "points",
+          "conditions": "Window 32,768 tokens",
+          "source": "https://github.com/strands-labs/strands-decider#gemma-4-models",
+          "note": "Index points, not a ratio; the kit's own scale"
+        }
+      ]
+    },
     "jev-omni": {
       "name": "Jev-Omni",
       "maker": "akhilaaa3",
@@ -3211,6 +3534,88 @@
         }
       ],
       "headline": "On its publisher's DecisionBench Medium it trails Jev 1.13 (87.57% vs 90.48%) at a slightly higher per-state cost, but on the independent JevBench v1.5.4 it is the closest open model to Jev (composite 71.5 vs 72.1) and adds image, audio and video input, which Jev lacks."
+    },
+    "strands-decider-gemma4-26b-a4b-v1": {
+      "name": "Strands Decider Gemma 4 26B-A4B",
+      "maker": "Strands Agents",
+      "maker_id": "strandsagents",
+      "logo": "logos/strandsagents.png",
+      "maker_url": "https://huggingface.co/StrandsAgents",
+      "paper_or_code_url": "https://github.com/strands-labs/strands-decider",
+      "hf_url": "https://huggingface.co/StrandsAgents/strands-decider-26B-A4B-gemma4-v1-2610",
+      "params": "26B (LoRA r48 adapter + pointer head; checkpoint 0.27 GB on a 52 GB base)",
+      "architecture": "Gemma 4 26B-A4B instruction-tuned text decoder, a mixture-of-experts model (26B parameters, about 4B active per token) + LoRA r48 on attention and MLP projections + pointer head (dim 768); same shared-state, isolated-question serving as the 2B. Temperature fitted per question type. About 51 GB of GPU memory for the weights in bf16; 245 ms median per JevBench question on one H100. Text only",
+      "base_model": "google/gemma-4-26B-A4B-it (revision 4d7ae498)",
+      "training": "135,602 rows: hobson-v21's 123,339 (public classification, multi-step documents, adequacy) plus 12,263 code-task rows; targets are the output distributions of a frozen Qwen3.5-4B teacher with an anchor toward strands-decider-2B-hobson-v19; three seeds of one epoch (4,109 steps) on 8 H100s, souped and calibrated",
+      "benchmarks": [
+        {
+          "suite": "JevBench public",
+          "what": "External decision benchmark: 231 public tasks across easy, standard and hard tiers",
+          "metric": "tasks right",
+          "higher_is_better": true,
+          "model": 0.896,
+          "model_display": "207/231",
+          "unit": "ratio",
+          "conditions": "231 public tasks, window 4,096 tokens; served from the published files on one NVIDIA L4 (2B) or H100 (Gemma 4)",
+          "source": "https://huggingface.co/StrandsAgents/strands-decider-26B-A4B-gemma4-v1-2610",
+          "note": "Jev 1.13.0 figure from JevBench's published per-task outcomes on the same 231 public tasks (board v1.2 run against the production API, Sept 2026; results/v1.2/jevbench-v1.2-per-task.json in the fstandhartinger/jevbench repository; tiers 48/48 easy, 71/72 standard, 81/111 hard), not a Strands run. Jev was served at its own context limit, Strands at a 4,096-token window. Brier and ECE stay unpaired: the board publishes Jev's calibration only for the hard tier.",
+          "jev": 0.866,
+          "jev_display": "200/231"
+        },
+        {
+          "suite": "JevBench public",
+          "what": "Same tasks; calibration (Brier score of the reported probabilities)",
+          "metric": "Brier",
+          "higher_is_better": false,
+          "model": 0.162,
+          "unit": "ratio",
+          "conditions": "231 public tasks, window 4,096 tokens; served from the published files on one NVIDIA L4 (2B) or H100 (Gemma 4)",
+          "source": "https://huggingface.co/StrandsAgents/strands-decider-26B-A4B-gemma4-v1-2610"
+        },
+        {
+          "suite": "JevBench public",
+          "what": "Same tasks; calibration (expected calibration error)",
+          "metric": "ECE",
+          "higher_is_better": false,
+          "model": 0.051,
+          "unit": "ratio",
+          "conditions": "231 public tasks, window 4,096 tokens; served from the published files on one NVIDIA L4 (2B) or H100 (Gemma 4)",
+          "source": "https://huggingface.co/StrandsAgents/strands-decider-26B-A4B-gemma4-v1-2610"
+        },
+        {
+          "suite": "Strands held-out short tasks",
+          "what": "Held-out items from the public classification datasets the recipe trains on (intent, topic, sentiment, NLI, QA)",
+          "metric": "accuracy",
+          "higher_is_better": true,
+          "model": 0.708,
+          "unit": "ratio",
+          "conditions": "6,000 items; the publisher's own held-out split",
+          "source": "https://huggingface.co/StrandsAgents/strands-decider-26B-A4B-gemma4-v1-2610",
+          "note": "In-distribution: same sources as training, held-out rows"
+        },
+        {
+          "suite": "Strands held-out code tasks",
+          "what": "Code review, commit, defect and program-output decisions (CodeReviewer, CommitPackFT, Juliet, CodeContests, generated programs)",
+          "metric": "accuracy",
+          "higher_is_better": true,
+          "model": 0.859,
+          "unit": "ratio",
+          "conditions": "Publisher's held-out code split; figure from the strands-decider README's Gemma 4 table",
+          "source": "https://github.com/strands-labs/strands-decider#gemma-4-models",
+          "note": "In-distribution: same sources as training, held-out rows"
+        },
+        {
+          "suite": "Decision Index 0.2.1",
+          "what": "The decision-model index of the open decision-index kit, balanced skill",
+          "metric": "index",
+          "higher_is_better": true,
+          "model": 48.69,
+          "unit": "points",
+          "conditions": "Window 32,768 tokens",
+          "source": "https://github.com/strands-labs/strands-decider#gemma-4-models",
+          "note": "Index points, not a ratio; the kit's own scale"
+        }
+      ]
     }
   }
 }
